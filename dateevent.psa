@@ -1,0 +1,11 @@
+[Project]
+category = Development
+maintainer = Boris Pohler
+appname = DateEvent
+section = development
+pyversion = 2.7
+project = dateevent
+email = email@example.com
+desc = Show Events on EventScreen
+template = harmattan
+

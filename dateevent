@@ -1,0 +1,323 @@
+#!/usr/bin/python2.6
+#-*- coding: utf-8 -*-
+
+import os
+import sys
+sys.path.append("/usr/share/dateevent")
+import pickle
+import subprocess
+import dbus
+import dbus.mainloop.glib
+from sqlite3 import *
+from time import time
+from datetime import datetime
+from eventfeed import EventFeedService, EventFeedItem
+from PySide import QtCore
+from PySide.QtCore import Qt
+from PySide import QtGui
+from PySide import QtDeclarative
+
+#OpenGL Rendering
+from PySide import QtOpenGL
+
+class dateevent(QtCore.QObject):
+	def __init__(self):
+                QtCore.QObject.__init__(self)
+		#Oberfläche und Instanzierungen für QML2Py Funktionen
+		self.view = QtDeclarative.QDeclarativeView()
+
+		#OpenGL Rendering
+		self.glw = QtOpenGL.QGLWidget()
+        	self.view.setViewport(self.glw)
+
+                if os.path.exists('/usr/share/dateevent/qml'):
+                    self.view.setSource('/usr/share/dateevent/qml/main.qml')
+                else:
+                    self.view.setSource(os.path.join('qml','main.qml'))
+
+                # vor psa-assistant
+		#self.view.setSource(QtCore.QUrl('qml/main.qml'))
+		self.root = self.view.rootObject()
+
+		#instantiate the Python object
+		self.pyfunc = pyfunc()
+
+                all_calendars = self.get_calendars()
+                print "alle Kalender:"
+                print all_calendars
+
+    		#expose the object to QML
+		self.context = self.view.rootContext()
+		self.context.setContextProperty("pyfunc", self.pyfunc)
+                self.context.setContextProperty("calendars", all_calendars)
+
+		#Variable wie viele Tage angezeigt werden sollen, wird per Settings "befüllt"
+		self.dayamount = None
+
+		#Wird zu 1 bei erstem Start!		
+		self.firsttime = 0
+
+		# Reagiert auf UpdateButton und ruft Klasse auf,
+		# welche die gewählte Tageszahl speichert
+		self.pyfunc.new_dayamount.connect(self.new_dayamount)
+
+                # reagiert auf onAccepted des MultiSelectionDialogs
+                self.pyfunc.update_calender_selection.connect(self.new_cal_selection)
+
+		# reagiert auf drücken des "Start"/"Update" Buttons und bindet an
+		self.pyfunc.start.connect(self.start)
+
+		# reagiert (nur) auf Update-Button - aktualisiert den Feed!
+		self.pyfunc.update_feed.connect(self.update_feed) 
+
+		#löscht den Termine-Feed
+		self.pyfunc.deleter.connect(self.deleter)
+
+		#einlesen der cfg und setzen der Werte!
+		self.settings()
+
+                #dbus
+                dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+                self.bus = dbus.SessionBus()
+                try:
+                        # Get the remote object
+                        self.remote_object = self.bus.get_object("org.freedesktop.Tracker1",
+                                       "/org/freedesktop/Tracker1/Resources")
+                        # Get the remote interface for the remote object
+                        self.iface = dbus.Interface(self.remote_object, "org.freedesktop.Tracker1.Resources")
+                except dbus.DBusException:
+                        print_exc()
+                        sys.exit(1)
+                
+                self.iface.connect_to_signal("GraphUpdated", self.calendar_db_changed)
+
+#--------------------------------------------------------------------------------------------------
+	def deleter(self):
+		service = EventFeedService('dateevent', 'DateEvent')
+		service.remove_items()
+		self.reset()
+
+	def reset(self):
+		f = open("/home/user/.config/calevents.cfg", "w")
+		pickle.dump({"firststart": True, "dayamount": 2, "calendars": []}, f)
+
+        def calendar_db_changed(self, arg1, arg2, arg3):
+            if arg1 =='http://www.semanticdesktop.org/ontologies/2007/04/02/ncal#Event':
+                print "kalender-db verändert, update event-screen"
+                self.update_feed(6)
+
+#--------------------------------------------------------------------------------------------------
+
+	def settings(self):
+		print "Settings"
+		#Prüfen der Config-Pfade sonst anlegen der Datei!
+		if os.path.isfile('/home/user/.config/calevents.cfg') == True:
+			print "cfg schon da"
+			#Laden der gespeicherten Werte
+			f = open("/home/user/.config/calevents.cfg")
+			l = pickle.load(f)
+                        self.selected_calendars = l["calendars"]
+                        print "Index gewählt:"
+                        print self.selected_calendars
+                        self.context.setContextProperty("selected_calendars", self.selected_calendars)
+
+		else:
+			print "cfg wird erstellt"
+			#erstellen einer entsprechenden cfg mit pickle
+			f = open("/home/user/.config/calevents.cfg", "w")
+			pickle.dump({"firststart": True, "dayamount": 2, "calendars": []}, f)
+
+			self.firsttime = 1
+			
+			f = open("/home/user/.config/calevents.cfg")
+			l = pickle.load(f)
+                        self.selected_calendars = l["calendars"]
+			self.context.setContextProperty("selected_calendars", self.selected_calendars)
+			
+			#Wird auf False gespeichert um bei einem Reset wieder True sein zu dürfen :)
+			l["firststart"] = False
+
+			#Speichern der Daten
+			f = open("/home/user/.config/calevents.cfg", "w")
+			pickle.dump(l,f)
+		
+		#Start/Update Button richtig beschriften
+		if self.firsttime == 0:		
+			self.root.set_startupdate("False")
+
+		else:
+			self.root.set_startupdate("True")
+		
+
+		#dayamout in SelectionDialog nach letzter Wahl einstellen, oder 2 (3Tage) setzen
+		self.root.set_dayamount(int(l["dayamount"]))
+
+	#Speichert geänderte Werte bei der Anzahl der Tage
+	def new_dayamount(self, new_dayamount):
+		#Laden der gespeicherten Daten
+		f = open("/home/user/.config/calevents.cfg")
+		l = pickle.load(f)
+
+		l["dayamount"] = int(new_dayamount)
+
+		#Speichern der Daten
+		f = open("/home/user/.config/calevents.cfg", "w")
+		pickle.dump(l,f)
+
+        def new_cal_selection(self, indexes_selected_calendars):
+                print "new_cal_selection"
+                if indexes_selected_calendars:
+                    if len(indexes_selected_calendars) == 1:
+                            self.selected_calendars = [int(indexes_selected_calendars)]
+                    else:
+                            self.selected_calendars = eval(indexes_selected_calendars)
+                else:
+                    self.selected_calendars = []
+
+                f = open("/home/user/.config/calevents.cfg")
+                l = pickle.load(f)
+                l["calendars"] = self.selected_calendars
+                f = open("/home/user/.config/calevents.cfg", "w")
+		pickle.dump(l,f)
+                f.close()
+
+	#Vielleicht unnötig! :)
+	def start(self, new_dayamount):
+		self.events(new_dayamount, self.selected_calendars)
+
+        def get_calendars(self):
+                # verbindung zur sqlite-db
+                conn = connect("/home/user/.calendar/db")
+		curs = conn.cursor()
+  
+                # SQL-Abfrage für alle Kalender 
+		query_calendars = "SELECT CalendarId,Name,Color\
+                                   FROM Calendars\
+                                   WHERE modifiedDate > 1306879230"
+		# SQL-Abfrage durchführen und Ergebnisse ausgeben
+		curs.execute(query_calendars)
+		self.all_calendars = curs.fetchall()
+                print self.all_calendars
+
+		# Dictionary erzeugen, dass jeder CalendarId eine Farbe zuordnet
+                # und den namen zuordnet
+		#self.calendars = dict()
+		#for calendar_id, name, color in all_calendars:
+    		#	self.cal_color[name] = (calendar_id, color)
+
+		# Liste der IDs generieren, geht bestimmt noch schöner, ich 
+		# habs nicht so mit Strings
+                self.ids_calendars = []
+		self.names_calendars= []
+		for calId, name, color in self.all_calendars:
+    			self.names_calendars.append(name)
+                        self.ids_calendars.append(calId)
+		return self.names_calendars
+
+	def events(self, dayamount, calendars):
+		# verbindung zur sqlite-db
+		conn = connect("/home/user/.calendar/db")
+		curs = conn.cursor()
+
+		# nächsten tage, die abgefragt werden sollen
+		days_list = [1,2,3,4,5,6,7,14,30] #gemäß der Liste der UI 
+		days_wanted = int(dayamount)
+		days_ahead = days_list[days_wanted]
+
+                print 'indizes:'
+                print calendars
+                print self.all_calendars
+                calender = [self.all_calendars[i][0] for i in calendars]
+                print 'ids:'
+                print calender
+                
+                calender = unicode("','".join(calender))
+
+                print calender
+
+		# unix zeit von heute 
+		unixtime_now = int(time())
+		unixtime_in_days_ahead = unixtime_now + days_ahead*86400
+
+		# SQL-Abfrage der Events nur für die ausgewählten Kalender
+		query_events = "SELECT Summary, Location, DateStart, Notebook FROM Components \
+                		WHERE DateStart BETWEEN {0} AND {1}\
+                		AND Notebook in ('{2}')\
+                		AND DateDeleted = '0'".format(unixtime_now,unixtime_in_days_ahead,calender)
+		curs.execute(query_events)
+		all_events = curs.fetchall()
+
+		#Ausgabe
+		print
+		print "Einträge der nächsten {0} Tage:".format(days_ahead)
+		for summary, location, datestart, cal in all_events:
+   			print type(summary), type(location), type(datetime.fromtimestamp(datestart)), cal
+			calId = self.ids_calendars.index(cal)
+			datestart = datetime.fromtimestamp(datestart)
+			day = str(datestart)
+			day = int(day[8:10])
+			
+			self.feeder(summary, location, datestart, day, calId)
+		
+		# Verbindung zur DB beenden
+		conn.close()
+
+#--------------------------------------------------------------------------------------------------
+
+	def feeder(self, summary, location, datestart, day, calId):
+		#calendarname = "Persönlich" #TODO: nach SQL Daten
+                calendarname = self.all_calendars[calId][1]
+                calendarcolor = self.all_calendars[calId][2]
+		day_icon_no = day
+                print calendarname, calendarcolor
+
+		service = EventFeedService('dateevent', 'DateEvent')
+
+                icon = '/usr/share/dateevent/img/icon-l-calendar-%d.png' % day_icon_no
+
+		item = EventFeedItem(icon, 
+                                    u'Termin aus Kalender: <font color="{0}">{1}</font>'.format(calendarcolor,calendarname),
+                                    datestart ) 
+                #gültiger Timestamp: datetime.datetime(2011, 11, 02, 8, 30, 0, 0)		
+		item.set_body(summary)
+		item.set_footer(location)
+		
+		item.set_custom_action(self.on_item_clicked)
+		service.add_item(item)
+
+#--------------------------------------------------------------------------------------------------
+
+	def update_feed(self, dayamount):
+		print "machen wir mal nur ein Update!"		
+		service = EventFeedService('dateevent', 'DateEvent')
+		service.remove_items()
+		
+		self.events(dayamount,self.selected_calendars)
+
+#--------------------------------------------------------------------------------------------------
+
+	# Muss ausgelagert werden in den zukünftigen "Deamon",
+	# sonst wird es logischer Weise mit beendet - dann gibt es keine Reaktion mehr!
+	def on_item_clicked(self):
+    		print 'the user clicked the item'
+		subprocess.Popen(['/usr/bin/organiser'])
+
+#--------------------------------------------------------------------------------------------------
+
+# Klasse für Funktionen die aus QML heraus angesprochen werden sollen:
+class pyfunc(QtCore.QObject):
+	start = QtCore.Signal(str)
+	deleter = QtCore.Signal()
+	new_dayamount = QtCore.Signal(str)
+        update_calender_selection = QtCore.Signal(str)
+	update_feed = QtCore.Signal(str)
+
+	def __init__(self):
+		QtCore.QObject.__init__(self)
+
+#Starten der App
+if __name__ == '__main__':
+	app = QtGui.QApplication(sys.argv)
+	start = dateevent()
+	start.view.showFullScreen()
+    	sys.exit(app.exec_())

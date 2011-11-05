@@ -1,0 +1,153 @@
+running bdist_deb
+running sdist_dsc
+CALLING dpkg-source -b dateevent-0.1.0 (in dir deb_dist)
+dpkg-source: Information: Quellformat »3.0 (quilt)« wird verwendet
+dpkg-source: Information: dateevent wird unter Benutzung des existierenden ./dateevent_0.1.0.orig.tar.gz gebaut
+dpkg-source: Information: dateevent wird in dateevent_0.1.0-1.debian.tar.gz gebaut
+dpkg-source: Information: dateevent wird in dateevent_0.1.0-1.dsc gebaut
+dpkg-source: Warnung: unsigniertes Quellpaket wird extrahiert (dateevent_0.1.0-1.dsc)
+dpkg-source: Information: dateevent wird nach dateevent-0.1.0 extrahiert
+dpkg-source: Information: dateevent_0.1.0.orig.tar.gz wird entpackt
+dpkg-source: Information: dateevent_0.1.0-1.debian.tar.gz wird entpackt
+dpkg-buildpackage: exportieren von CFLAGS aus dpkg-buildflags (Quelle: vendor): -g -O2
+dpkg-buildpackage: exportieren von CPPFLAGS aus dpkg-buildflags (Quelle: vendor): 
+dpkg-buildpackage: exportieren von CXXFLAGS aus dpkg-buildflags (Quelle: vendor): -g -O2
+dpkg-buildpackage: exportieren von FFLAGS aus dpkg-buildflags (Quelle: vendor): -g -O2
+dpkg-buildpackage: exportieren von LDFLAGS aus dpkg-buildflags (Quelle: vendor): -Wl,-Bsymbolic-functions
+dpkg-buildpackage: Quellpaket dateevent
+dpkg-buildpackage: Quellversion 0.1.0-1
+dpkg-buildpackage: Quellen geändert durch Gabriel Boehme and Boris Pohler <email@example.com>
+ dpkg-source --before-build dateevent-0.1.0
+dpkg-buildpackage: Host-Architektur i386
+ fakeroot debian/rules clean
+dh clean --with python2 --buildsystem=python_distutils
+   dh_testdir -O--buildsystem=python_distutils
+   dh_auto_clean -O--buildsystem=python_distutils
+running clean
+'build/lib.linux-i686-2.6' does not exist -- can't clean it
+'build/bdist.linux-i686' does not exist -- can't clean it
+'build/scripts-2.6' does not exist -- can't clean it
+   dh_clean -O--buildsystem=python_distutils
+ debian/rules build
+dh build --with python2 --buildsystem=python_distutils
+   dh_testdir -O--buildsystem=python_distutils
+   dh_auto_configure -O--buildsystem=python_distutils
+   dh_auto_build -O--buildsystem=python_distutils
+running build
+running build_scripts
+creating build
+creating build/scripts-2.6
+copying and adjusting dateevent -> build/scripts-2.6
+changing mode of build/scripts-2.6/dateevent from 644 to 755
+   dh_auto_test -O--buildsystem=python_distutils
+ fakeroot debian/rules binary
+dh binary --with python2 --buildsystem=python_distutils
+   dh_testroot -O--buildsystem=python_distutils
+   dh_prep -O--buildsystem=python_distutils
+   dh_installdirs -O--buildsystem=python_distutils
+   dh_auto_install -O--buildsystem=python_distutils
+running install
+running build
+running build_scripts
+running install_scripts
+creating /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr
+creating /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/bin
+copying build/scripts-2.6/dateevent -> /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/bin
+changing mode of /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/bin/dateevent to 755
+running install_data
+creating /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share
+creating /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/applications
+copying dateevent.desktop -> /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/applications
+creating /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/icons
+creating /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/icons/hicolor
+creating /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/icons/hicolor/64x64
+creating /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/icons/hicolor/64x64/apps
+copying dateevent.png -> /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/icons/hicolor/64x64/apps
+creating /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/dateevent
+creating /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/dateevent/qml
+copying qml/main.qml -> /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/dateevent/qml
+copying qml/MainPage.qml -> /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/dateevent/qml
+copying qml/functions.js -> /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/dateevent/qml
+creating /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/dateevent/img
+copying img/icon-l-calendar-1.png -> /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/dateevent/img
+copying img/icon-l-calendar-10.png -> /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/dateevent/img
+copying img/icon-l-calendar-11.png -> /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/dateevent/img
+copying img/icon-l-calendar-12.png -> /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/dateevent/img
+copying img/icon-l-calendar-13.png -> /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/dateevent/img
+copying img/icon-l-calendar-14.png -> /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/dateevent/img
+copying img/icon-l-calendar-15.png -> /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/dateevent/img
+copying img/icon-l-calendar-16.png -> /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/dateevent/img
+copying img/icon-l-calendar-17.png -> /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/dateevent/img
+copying img/icon-l-calendar-18.png -> /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/dateevent/img
+copying img/icon-l-calendar-19.png -> /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/dateevent/img
+copying img/icon-l-calendar-2.png -> /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/dateevent/img
+copying img/icon-l-calendar-20.png -> /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/dateevent/img
+copying img/icon-l-calendar-21.png -> /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/dateevent/img
+copying img/icon-l-calendar-22.png -> /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/dateevent/img
+copying img/icon-l-calendar-23.png -> /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/dateevent/img
+copying img/icon-l-calendar-24.png -> /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/dateevent/img
+copying img/icon-l-calendar-25.png -> /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/dateevent/img
+copying img/icon-l-calendar-26.png -> /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/dateevent/img
+copying img/icon-l-calendar-27.png -> /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/dateevent/img
+copying img/icon-l-calendar-28.png -> /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/dateevent/img
+copying img/icon-l-calendar-29.png -> /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/dateevent/img
+copying img/icon-l-calendar-3.png -> /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/dateevent/img
+copying img/icon-l-calendar-30.png -> /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/dateevent/img
+copying img/icon-l-calendar-31.png -> /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/dateevent/img
+copying img/icon-l-calendar-4.png -> /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/dateevent/img
+copying img/icon-l-calendar-5.png -> /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/dateevent/img
+copying img/icon-l-calendar-6.png -> /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/dateevent/img
+copying img/icon-l-calendar-7.png -> /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/dateevent/img
+copying img/icon-l-calendar-8.png -> /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/dateevent/img
+copying img/icon-l-calendar-9.png -> /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/dateevent/img
+copying img/icon-l-calendar-main-view.png -> /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/dateevent/img
+copying eventfeed.py -> /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/share/dateevent
+running install_egg_info
+Creating /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/lib/python2.6/dist-packages/
+Writing /mnt/programme/boris/Programme/harmattan/dateevent/deb_dist/dateevent-0.1.0/debian/dateevent/usr/lib/python2.6/dist-packages/dateevent-0.1.0.egg-info
+   dh_install -O--buildsystem=python_distutils
+   dh_installdocs -O--buildsystem=python_distutils
+   dh_installchangelogs -O--buildsystem=python_distutils
+   dh_installexamples -O--buildsystem=python_distutils
+   dh_installman -O--buildsystem=python_distutils
+   dh_installcatalogs -O--buildsystem=python_distutils
+   dh_installcron -O--buildsystem=python_distutils
+   dh_installdebconf -O--buildsystem=python_distutils
+   dh_installemacsen -O--buildsystem=python_distutils
+   dh_installifupdown -O--buildsystem=python_distutils
+   dh_installinfo -O--buildsystem=python_distutils
+   dh_installinit -O--buildsystem=python_distutils
+Duplicate specification "O=s" for option "O"
+   dh_installmenu -O--buildsystem=python_distutils
+   dh_installmime -O--buildsystem=python_distutils
+   dh_installmodules -O--buildsystem=python_distutils
+   dh_installlogcheck -O--buildsystem=python_distutils
+   dh_installlogrotate -O--buildsystem=python_distutils
+   dh_installpam -O--buildsystem=python_distutils
+   dh_installppp -O--buildsystem=python_distutils
+   dh_installudev -O--buildsystem=python_distutils
+   dh_installwm -O--buildsystem=python_distutils
+   dh_installxfonts -O--buildsystem=python_distutils
+   dh_bugfiles -O--buildsystem=python_distutils
+   dh_lintian -O--buildsystem=python_distutils
+   dh_gconf -O--buildsystem=python_distutils
+   dh_icons -O--buildsystem=python_distutils
+   dh_perl -O--buildsystem=python_distutils
+   dh_python2 -O--buildsystem=python_distutils
+   dh_usrlocal -O--buildsystem=python_distutils
+   dh_link -O--buildsystem=python_distutils
+   dh_compress -O--buildsystem=python_distutils
+   dh_fixperms -O--buildsystem=python_distutils
+   dh_strip -O--buildsystem=python_distutils
+   dh_makeshlibs -O--buildsystem=python_distutils
+   dh_shlibdeps -O--buildsystem=python_distutils
+   dh_installdeb -O--buildsystem=python_distutils
+   dh_gencontrol -O--buildsystem=python_distutils
+dpkg-gencontrol: Warnung: Paket dateevent: unbenutzte Substitutionsvariable ${python:Versions}
+   dh_md5sums -O--buildsystem=python_distutils
+   dh_builddeb -O--buildsystem=python_distutils
+dpkg-deb: Paket »dateevent« wird in »../dateevent_0.1.0-1_all.deb« gebaut.
+ dpkg-genchanges -b >../dateevent_0.1.0-1_i386.changes
+dpkg-genchanges: rein binärer Upload - es ist kein Quellcode hinzugefügt
+ dpkg-source --after-build dateevent-0.1.0
+dpkg-buildpackage: Binärpaket(e) hochzuladen (keine Quellen enthalten)
