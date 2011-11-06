@@ -50,6 +50,11 @@ Page {
         onClicked: {
             dialog_days.open()
         }
+
+        Image {
+                source: "image://theme/meegotouch-combobox-indicator"
+                anchors {left: parent.right; leftMargin: -50; verticalCenter: parent.verticalCenter}
+                }
     }
 
     Text {
@@ -68,6 +73,11 @@ Page {
             JS.createListView(calendars)
             dialog_calendar.open()
         }
+
+        Image {
+                source: "image://theme/meegotouch-combobox-indicator"
+                anchors {left: parent.right; leftMargin: -50; verticalCenter: parent.verticalCenter}
+                }
     }
 
     Text {
