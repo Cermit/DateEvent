@@ -4,6 +4,7 @@ import "functions.js" as JS
 
 Page {
     tools: commonTools
+    orientationLock: PageOrientation.LockPortrait
 
     property alias setstartupdatetext: startupdate.text
     property alias setdayamountindex: dialog_days.selectedIndex
