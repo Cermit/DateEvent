@@ -1,6 +1,6 @@
 import QtQuick 1.1
 import com.nokia.meego 1.0
-import "functions.js" as JS
+//import "functions.js" as JS
 
 Page {
     tools: commonTools
@@ -8,6 +8,7 @@ Page {
 
     property alias setstartupdatetext: startupdate.text
     property alias setdayamountindex: dialog_days.selectedIndex
+    property alias infoDialog: infoDialog
 
     Label {
         id: title
@@ -127,6 +128,12 @@ Page {
             ListElement { name: "7 Tage" }
             ListElement { name: "14 Tage" }
             ListElement { name: "30 Tage" }
+        }
+    }
+
+    QueryDialog {
+        id: infoDialog
+        titleText: qsTr("Information")
         }
     }
 }
