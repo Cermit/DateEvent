@@ -1,6 +1,5 @@
 import QtQuick 1.1
 import com.nokia.meego 1.0
-
 import "functions.js" as JS
 
 Page {
@@ -11,33 +10,39 @@ Page {
 
     Label {
         id: title
-        text: "CalEvents"
-        anchors.top: parent.top
-        anchors.topMargin: 20
-        anchors.left: parent.left
-        anchors.leftMargin: 20
-
+        anchors {top: parent.top; topMargin: 20; left: parent.left; leftMargin: 20}
+        text: qsTr("DateEvent")
         font.pixelSize: 70
     }
 
+    Rectangle {
+        id: headerline_p1
+        anchors {top: title.bottom; topMargin: 10 }
+        width: mainPage.width
+        height: 2
+        color: "lightgrey"
+
+    }
+
+    Rectangle {
+        id: headerline_p2
+        anchors.top: headerline_p1.bottom
+        width: mainPage.width
+        height: 2
+        color: "white"
+        }
+
     Text {
         id: dayamount_title
-        text: "Anzahl anzuzeigender Tage:"
-        anchors.bottom: dayamount_combo.top
-        anchors.bottomMargin: 20
-        anchors.left: parent.left
-        anchors.leftMargin: 20
-
+        anchors {bottom: dayamount_combo.top; bottomMargin: 20; left: parent.left; leftMargin: 20}
+        text: qsTr("Anzahl Kalendertage:")
         font.pixelSize: 20
     }
 
     Button {
         id: dayamount_combo
-        anchors.top: parent.top
-        anchors.topMargin: 200
-        anchors.horizontalCenter: parent.horizontalCenter
-
-        text: "Tage"
+        anchors {top: parent.top; topMargin: 200; horizontalCenter: parent.horizontalCenter}
+        text: qsTr("Auswahl Tage")
 
         onClicked: {
             dialog_days.open()
@@ -46,24 +51,15 @@ Page {
 
     Text {
         id: calcombo_title
-        text: "Anzahl anzuzeigender Kalender:"
-        anchors.bottom: calendar_combo.top
-        anchors.bottomMargin: 20
-        anchors.left: parent.left
-        anchors.leftMargin: 20
-
+        anchors {bottom: calendar_combo.top; bottomMargin: 20; left: parent.left; leftMargin: 20}
+        text: qsTr("Auswahl Kalender:")
         font.pixelSize: 20
     }
 
     Button {
         id: calendar_combo
-        anchors.top: parent.top
-        anchors.topMargin: 400
-        anchors.horizontalCenter: parent.horizontalCenter
-
-        text: "Kalender"
-
-	//enabled: false
+        anchors {top: parent.top; topMargin: 350; horizontalCenter: parent.horizontalCenter}
+        text: qsTr("Auswahl Kalender")
 
         onClicked: {
             JS.createListView(calendars)
@@ -71,19 +67,27 @@ Page {
         }
     }
 
+    Text {
+        id: chroniktext
+        anchors {top: parent.top; topMargin: 450; left: parent.left; leftMargin: 20}
+        text: qsTr("Nächste Termine zuerst zeigen:")
+        font {pixelSize: 24}
+
+            Switch {
+                id: chronik_slider
+                anchors {verticalCenter: parent.verticalCenter; left: parent.right; leftMargin: 20}
+                checked: true
+            }
+        }
+
     Button {
         id: startupdate
-        objectName: "startupdate"
-
-        anchors.top: parent.top
-        anchors.topMargin: 600
-        anchors.horizontalCenter: parent.horizontalCenter
-        enabled: true
-
-        text: "Start"
+        objectName: "startupdate" //for PySide binding
+        anchors {top: parent.top; topMargin: 600; horizontalCenter: parent.horizontalCenter}
+        text: qsTr("Start")
 
         onClicked: {
-	    if(startupdate.text == "Start"){pyfunc.start(dialog_days.selectedIndex); startupdate.text = "Update"}
+            if(startupdate.text == qsTr("Start")){pyfunc.start(dialog_days.selectedIndex); startupdate.text = qsTr("manuelles Update")}
 	    else{pyfunc.update_feed(dialog_days.selectedIndex)}
 	    
 	    pyfunc.new_dayamount(String(dialog_days.selectedIndex))
@@ -92,29 +96,23 @@ Page {
 
     MultiSelectionDialog {
         id: dialog_calendar
-        titleText: "Kalender Auswahl"
-
+        titleText: qsTr("Kalender Auswahl:")
         selectedIndexes: selected_calendars
-        //selectedIndexes: []
-        acceptButtonText: "Ok"
+        acceptButtonText: qsTr("Ok")
 
         model: ListModel {
             id: calender_listmodel
-            //ListElement { name: "Persönlich" }
-            //ListElement { name: "Studium" }
-            //ListElement { name: "Arbeit" }
+            //ListElement { name: "Placeholder for Python list element" }
         }
 
         onAccepted: {
-            console.log(dialog_calendar.selectedIndexes)
             pyfunc.update_calender_selection(String(dialog_calendar.selectedIndexes))
             }
     }
 
     SelectionDialog {
         id: dialog_days
-        titleText: "Kalender Auswahl"
-
+        titleText: qsTr("Anzahl Tage:")
         selectedIndex: -1
 
         model: ListModel {

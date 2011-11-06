@@ -2,16 +2,15 @@ import QtQuick 1.1
 import com.nokia.meego 1.0
 
 PageStackWindow {
-    id: appWindow
+    id: appWindow 
     initialPage: mainPage
 
     function set_startupdate(str) {
-	if (str === "True"){mainPage.setstartupdatetext = "Start"}
-	else {mainPage.setstartupdatetext = "Update"}
+        if (str === "True"){mainPage.setstartupdatetext = qsTr("Start")}
+        else {mainPage.setstartupdatetext = qsTr("manuelles Update")}
 		}
 
     function set_dayamount(number) {
-	console.log(number)
 	mainPage.setdayamountindex = number
 	}
 
@@ -33,7 +32,7 @@ PageStackWindow {
         id: myMenu
         visualParent: pageStack
         MenuLayout {
-            MenuItem { text: qsTr("Feed beenden"); onClicked: {pyfunc.deleter(); mainPage.setstartupdatetext = "Start"} }
+            MenuItem { text: qsTr("Feed beenden"); onClicked: {pyfunc.deleter(); mainPage.setstartupdatetext = qsTr("Start")} }
 	    MenuItem { text: qsTr("Information") }
         }
     }
