@@ -1,7 +1,7 @@
 import QtQuick 1.1
 import com.nokia.meego 1.0
 
-import "functions.js" as JS
+//import "functions.js" as JS
 
 Page {
     tools: commonTools
@@ -53,7 +53,7 @@ Page {
 
         Image {
                 source: "image://theme/meegotouch-combobox-indicator"
-                anchors {left: parent.right; leftMargin: -50; verticalCenter: parent.verticalCenter}
+                anchors {right: parent.right; rightMargin: 15; verticalCenter: parent.verticalCenter}
                 }
     }
 
@@ -76,7 +76,7 @@ Page {
 
         Image {
                 source: "image://theme/meegotouch-combobox-indicator"
-                anchors {left: parent.right; leftMargin: -50; verticalCenter: parent.verticalCenter}
+                anchors {right: parent.right; rightMargin: 15; verticalCenter: parent.verticalCenter}
                 }
     }
 
