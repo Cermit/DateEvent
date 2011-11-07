@@ -49,6 +49,7 @@ Page {
         text: qsTr("Auswahl Tage")
 
         onClicked: {
+            JS.create_listview_days_ahead(choice_days_ahead)
             dialog_days.open()
         }
 
@@ -71,7 +72,7 @@ Page {
         text: qsTr("Auswahl Kalender")
 
         onClicked: {
-            JS.createListView(calendars)
+            JS.create_listview_calendar(calendars)
             dialog_calendar.open()
         }
 
@@ -153,16 +154,7 @@ Page {
 
         model: ListModel {
             id: days_listmodel
-            ListElement { name: "1 Tag" }
-            ListElement { name: "2 Tage" }
-            ListElement { name: "3 Tage" }
-            ListElement { name: "4 Tage" }
-            ListElement { name: "5 Tage" }
-            ListElement { name: "6 Tage" }
-            ListElement { name: "7 Tage" }
-            ListElement { name: "14 Tage" }
-            ListElement { name: "30 Tage" }
-        }
+            }
     }
 
     SelectionDialog {
