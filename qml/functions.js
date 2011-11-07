@@ -15,3 +15,12 @@ function create_listview_days_ahead(list)
         days_listmodel.append({"name": list[i]})
     }
 }
+
+function create_listview_max_events(list)
+{
+    var i = 0
+    items_listmodel.clear()
+    for (i = 0; i<list.length; i++){
+        items_listmodel.append({"name": list[i]})
+    }
+}

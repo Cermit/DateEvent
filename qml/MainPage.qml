@@ -94,8 +94,9 @@ Page {
         anchors {top: parent.top; topMargin: 420; horizontalCenter: parent.horizontalCenter}
         text: qsTr("Auswahl Anzahl")
 
-        onClicked: {
+        onClicked: {            
             dialog_items.open()
+            JS.create_listview_max_events(choice_show_max_events)
         }
 
         Image {
@@ -164,19 +165,13 @@ Page {
 
         model: ListModel {
             id: items_listmodel
-            ListElement { name: "1" }
-            ListElement { name: "2" }
-            ListElement { name: "3" }
-            ListElement { name: "4" }
-            ListElement { name: "5" }
-            ListElement { name: "unbegrenzt" }
         }
     }
 
     QueryDialog {
         id: infoDialog
         titleText: qsTr("Information")
-        message: qsTr("Diese Anwendung wurde von Boris Pohlers und Gabriel Böhme entwickelt und sie steht unter der GPL3 Lizenz.")
+        message: qsTr("Diese Anwendung wurde von Boris Pohler und Gabriel Böhme entwickelt und sie steht unter der GPL3 Lizenz.")
         acceptButtonText: qsTr("Ok")
 
         onAccepted: {

@@ -45,7 +45,7 @@ class CalEvent(QtCore.QObject):
         self.calendar_names = self.get_calendar_names(self.all_calendars)
         self.calendar_ids = self.get_calendar_ids(self.all_calendars)
         self.choice_days_ahead = ['1','2','3','4','5','6','7','14','30']
-
+        self.choice_show_max_events = ['1','2','3','4','5','unbegrenzt']
         #instantiate the Python object
 	self.pyfunc = pyfunc()
 
@@ -82,8 +82,10 @@ class CalEvent(QtCore.QObject):
 	self.context.setContextProperty("pyfunc", self.pyfunc)
         self.context.setContextProperty("calendars", self.calendar_names)
         self.context.setContextProperty("selected_calendars", self.selected_calendars)
-        self.context.setContextProperty("choice_days_ahead", self.choice_days_ahead)
         self.context.setContextProperty("next_event_on_top", self.next_event_on_top)
+        self.context.setContextProperty("show_events_max", self.show_events_max)
+        self.context.setContextProperty("choice_days_ahead", self.choice_days_ahead)
+        self.context.setContextProperty("choice_show_max_events", self.choice_show_max_events)
         self.root.set_dayamount(self.selected_dayamount)
         
         #dbus
@@ -108,6 +110,7 @@ class CalEvent(QtCore.QObject):
             self.config.set('General', 'selected_dayamount', '2')
             self.config.set('General', 'selected_calendars', [])
             self.config.set('General', 'next_event_on_top', 'True')
+            self.config.set('General', 'show_events_max', '5')
             self.save_config()      
 
     def readconf(self):
@@ -119,6 +122,8 @@ class CalEvent(QtCore.QObject):
                                                       'selected_calendars')))
             self.next_event_on_top = eval(self.config.get('General',
                                                      'next_event_on_top'))
+            self.show_events_max = int(self.config.get('General', 
+                                                      'show_events_max'))
 
     def save_config(self):
         with open(os.path.expanduser('~/.config/dateevent.cfg'), 'wb') as configfile:
@@ -154,7 +159,7 @@ class CalEvent(QtCore.QObject):
 
 	#Vielleicht unnötig! :)
     def start(self, new_dayamount):
-	self.get_events(new_dayamount, self.selected_calendars)
+	self.get_events(new_dayamount, self.selected_calendars, self.show_events_max)
 
     def get_calendars(self):
         # verbindung zur sqlite-db
@@ -184,12 +189,13 @@ class CalEvent(QtCore.QObject):
         print calendar_ids
         return calendar_ids
 
-    def get_events(self, dayamount, calendar_ids, max_events_count=4):
+    def get_events(self, dayamount, calendar_ids, show_events_max):
 	# verbindung zur sqlite-db
 	conn = connect("/home/user/.calendar/db")
 	curs = conn.cursor()
 	# nächsten tage, die abgefragt werden sollen
 	days_ahead = int(self.choice_days_ahead[int(dayamount)])
+        print show_events_max
         # calendars
         selected_calender = [self.all_calendars[i][0] for i in calendar_ids]
         selected_calender = unicode("','".join(selected_calender))
@@ -212,7 +218,7 @@ class CalEvent(QtCore.QObject):
         if self.next_event_on_top:
             all_events = self.change_events_timeline(all_events)
 
-	for summary, location, datestart, cal, faketime in all_events[:max_events_count]:
+	for summary, location, datestart, cal, faketime in all_events[:show_events_max]:
             calId = self.calendar_ids.index(cal)
             faketime = datetime.fromtimestamp(faketime)
             datestart = datetime.fromtimestamp(datestart)
@@ -261,7 +267,7 @@ class CalEvent(QtCore.QObject):
         print "machen wir mal nur ein Update!"		
         service = EventFeedService('dateevent', 'DateEvent')
         service.remove_items()
-        self.get_events(dayamount,self.selected_calendars)
+        self.get_events(dayamount,self.selected_calendars, self.show_events_max)
 
 #--------------------------------------------------------------------------------------------------
 
