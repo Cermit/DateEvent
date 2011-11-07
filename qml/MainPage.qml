@@ -10,6 +10,7 @@ Page {
     property alias setstartupdatetext: startupdate.text
     property alias setdayamountindex: dialog_days.selectedIndex
     property alias infoDialog: infoDialog
+    property alias resetDialog: resetDialog
 
     Label {
         id: title
@@ -38,13 +39,13 @@ Page {
     Text {
         id: dayamount_title
         anchors {bottom: dayamount_combo.top; bottomMargin: 20; left: parent.left; leftMargin: 20}
-        text: qsTr("Anzahl Kalendertage:")
+        text: qsTr("berücksichtigte Kalendertage:")
         font.pixelSize: 20
     }
 
     Button {
         id: dayamount_combo
-        anchors {top: parent.top; topMargin: 200; horizontalCenter: parent.horizontalCenter}
+        anchors {top: parent.top; topMargin: 180; horizontalCenter: parent.horizontalCenter}
         text: qsTr("Auswahl Tage")
 
         onClicked: {
@@ -60,13 +61,13 @@ Page {
     Text {
         id: calcombo_title
         anchors {bottom: calendar_combo.top; bottomMargin: 20; left: parent.left; leftMargin: 20}
-        text: qsTr("Auswahl Kalender:")
+        text: qsTr("berücksichtigte Kalender:")
         font.pixelSize: 20
     }
 
     Button {
         id: calendar_combo
-        anchors {top: parent.top; topMargin: 350; horizontalCenter: parent.horizontalCenter}
+        anchors {top: parent.top; topMargin: 300; horizontalCenter: parent.horizontalCenter}
         text: qsTr("Auswahl Kalender")
 
         onClicked: {
@@ -81,8 +82,30 @@ Page {
     }
 
     Text {
+        id: itemsAmount_title
+        anchors {bottom: itemsAmount_combo.top; bottomMargin: 20; left: parent.left; leftMargin: 20}
+        text: qsTr("angezeigte Termine:")
+        font.pixelSize: 20
+    }
+
+    Button {
+        id: itemsAmount_combo
+        anchors {top: parent.top; topMargin: 420; horizontalCenter: parent.horizontalCenter}
+        text: qsTr("Auswahl Anzahl")
+
+        onClicked: {
+            dialog_items.open()
+        }
+
+        Image {
+                source: "image://theme/meegotouch-combobox-indicator"
+                anchors {right: parent.right; rightMargin: 15; verticalCenter: parent.verticalCenter}
+                }
+    }
+
+    Text {
         id: chroniktext
-        anchors {top: parent.top; topMargin: 450; left: parent.left; leftMargin: 20}
+        anchors {top: parent.top; topMargin: 540; left: parent.left; leftMargin: 20}
         text: qsTr("Nächste Termine zuerst zeigen:")
         font {pixelSize: 24}
 
@@ -96,7 +119,7 @@ Page {
     Button {
         id: startupdate
         objectName: "startupdate" //for PySide binding
-        anchors {top: parent.top; topMargin: 600; horizontalCenter: parent.horizontalCenter}
+        anchors {top: parent.top; topMargin: 650; horizontalCenter: parent.horizontalCenter}
         text: qsTr("Start")
 
         onClicked: {
@@ -142,8 +165,46 @@ Page {
         }
     }
 
+    SelectionDialog {
+        id: dialog_items
+        titleText: qsTr("Anzahl Termine:")
+        selectedIndex: -1
+
+        model: ListModel {
+            id: items_listmodel
+            ListElement { name: "1" }
+            ListElement { name: "2" }
+            ListElement { name: "3" }
+            ListElement { name: "4" }
+            ListElement { name: "5" }
+            ListElement { name: "unbegrenzt" }
+        }
+    }
+
     QueryDialog {
         id: infoDialog
         titleText: qsTr("Information")
+        message: qsTr("Diese Anwendung wurde von Boris Pohlers und Gabriel Böhme entwickelt und sie steht unter der GPL3 Lizenz.")
+        acceptButtonText: qsTr("Ok")
+
+        onAccepted: {
+            infoDialog.close()
+            }
         }
+
+    QueryDialog {
+        id: resetDialog
+        titleText: qsTr("Achtung!")
+        message: qsTr("Möchtest du den Termin-Feed wirklich beenden?")
+        acceptButtonText: qsTr("Ja")
+        rejectButtonText: qsTr("Nein")
+
+        onAccepted: {
+            pyfunc.deleter(); mainPage.setstartupdatetext = qsTr("Start")
+        }
+
+        onRejected: {
+            infoDialog.close()
+        }
+    }
     }

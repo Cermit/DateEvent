@@ -32,8 +32,8 @@ PageStackWindow {
         id: myMenu
         visualParent: pageStack
         MenuLayout {
-            MenuItem { text: qsTr("Feed beenden"); onClicked: {pyfunc.deleter(); mainPage.setstartupdatetext = qsTr("Start")} }
+            MenuItem { text: qsTr("Feed beenden"); onClicked: {mainPage.resetDialog.open()}}
             MenuItem { text: qsTr("Information"); onClicked: mainPage.infoDialog.open() }
+            }
         }
     }
-}
