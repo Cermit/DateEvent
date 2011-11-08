@@ -45,7 +45,7 @@ class CalEvent(QtCore.QObject):
         self.calendar_names = self.get_calendar_names(self.all_calendars)
         self.calendar_ids = self.get_calendar_ids(self.all_calendars)
         self.choice_days_ahead = ['1','2','3','4','5','6','7','14','30']
-        self.choice_show_max_events = ['1','2','3','4','5','unbegrenzt']
+        self.choice_show_max_events = ['1','2','3','4','5']
         #instantiate the Python object
 	self.pyfunc = pyfunc()
 
@@ -64,6 +64,9 @@ class CalEvent(QtCore.QObject):
 
 	#löscht den Termine-Feed
 	self.pyfunc.delete_feed.connect(self.delete_feed)
+
+        #löscht den Termine-Feed
+	self.pyfunc.update_show_events_max.connect(self.update_show_events_max)
 
 	# Config stuff
         self.config = ConfigParser.ConfigParser()
@@ -158,6 +161,11 @@ class CalEvent(QtCore.QObject):
         self.config.set('General', 'selected_calendars', self.selected_calendars)
         self.save_config()
 
+    def update_show_events_max(self, index):
+        self.show_events_max = int(self.choice_show_max_events[int(index)])
+        self.config.set('General', 'show_events_max', self.choice_show_max_events[int(index)])
+        self.save_config()
+
 	#Vielleicht unnötig! :)
     def start(self, new_dayamount):
 	self.get_events(new_dayamount, self.selected_calendars, self.show_events_max)
@@ -219,7 +227,7 @@ class CalEvent(QtCore.QObject):
         if self.next_event_on_top:
             all_events = self.change_events_timeline(all_events)
 
-	for summary, location, datestart, cal, faketime in all_events[:show_events_max]:
+	for summary, location, datestart, cal, faketime in all_events[:self.show_events_max]:
             calId = self.calendar_ids.index(cal)
             faketime = datetime.fromtimestamp(faketime)
             datestart = datetime.fromtimestamp(datestart)
@@ -286,6 +294,7 @@ class pyfunc(QtCore.QObject):
     delete_feed = QtCore.Signal()
     new_dayamount = QtCore.Signal(str)
     update_calender_selection = QtCore.Signal(str)
+    update_show_events_max = QtCore.Signal(str)
     update_feed = QtCore.Signal(str)
 
     def __init__(self):

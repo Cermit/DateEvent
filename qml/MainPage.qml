@@ -168,6 +168,9 @@ Page {
         model: ListModel {
             id: items_listmodel
             }
+        onAccepted: {
+            pyfunc.update_show_events_max(String(dialog_items.selectedIndex))
+            }
     }
 
     QueryDialog {
@@ -189,7 +192,7 @@ Page {
         rejectButtonText: qsTr("Nein")
 
         onAccepted: {
-            pyfunc.deleter(); mainPage.setstartupdatetext = qsTr("Start")
+            pyfunc.delete_feed(); mainPage.setstartupdatetext = qsTr("Start")
         }
 
         onRejected: {
