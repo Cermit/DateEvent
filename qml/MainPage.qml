@@ -8,6 +8,7 @@ Page {
     orientationLock: PageOrientation.LockPortrait
 
     property alias setstartupdatetext: startupdate.text
+    property alias setnextontopslider: chronik_slider.checked 
     property alias setdayamountindex: dialog_days.selectedIndex
     property alias setmaxevents: dialog_items.selectedIndex
     property alias infoDialog: infoDialog
@@ -97,8 +98,8 @@ Page {
 
         onClicked: {            
             JS.create_listview_max_events(choice_show_max_events)
-	    console.log(dialog_items.model.ListElement.name)
-	    dialog_items.open()
+        console.log(dialog_items.model.ListElement.name)
+        dialog_items.open()
         }
 
         Image {
@@ -117,7 +118,6 @@ Page {
                 id: chronik_slider
                 objectName : "chronik_slider"
                 anchors {verticalCenter: parent.verticalCenter; left: parent.right; leftMargin: 20}
-                checked: true
 
                 onCheckedChanged: {
                     console.log("Switch betaetigt")
@@ -134,9 +134,9 @@ Page {
 
         onClicked: {
             if(startupdate.text == qsTr("Start")){pyfunc.start(dialog_days.selectedIndex); startupdate.text = qsTr("manuelles Update")}
-	    else{pyfunc.update_feed(dialog_days.selectedIndex)}
-	    
-	    pyfunc.new_dayamount(String(dialog_days.selectedIndex))
+        else{pyfunc.update_feed(dialog_days.selectedIndex)}
+
+        pyfunc.new_dayamount(String(dialog_days.selectedIndex))
         }
     }
 
@@ -159,7 +159,7 @@ Page {
     SelectionDialog {
         id: dialog_days
         titleText: qsTr("Anzahl Tage:")
-        selectedIndex: 0
+        selectedIndex: 1
 
         model: ListModel {
             id: days_listmodel
@@ -169,7 +169,7 @@ Page {
     SelectionDialog {
         id: dialog_items
         titleText: qsTr("Anzahl Termine:")
-	selectedIndex: 0	
+        selectedIndex: 1
 
         model: ListModel {
             id: items_listmodel

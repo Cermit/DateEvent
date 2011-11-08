@@ -47,33 +47,33 @@ class CalEvent(QtCore.QObject):
         self.choice_days_ahead = ['1','2','3','4','5','6','7','14','30']
         self.choice_show_max_events = ['1','2','3','4','5']
         #instantiate the Python object
-	self.pyfunc = pyfunc()
+        self.pyfunc = pyfunc()
 
-	# Reagiert auf UpdateButton und ruft Klasse auf,
-	# welche die gewählte Tageszahl speichert
-	self.pyfunc.new_dayamount.connect(self.new_dayamount)
+        # Reagiert auf UpdateButton und ruft Klasse auf,
+        # welche die gewählte Tageszahl speichert
+        self.pyfunc.new_dayamount.connect(self.new_dayamount)
 
         # reagiert auf onAccepted des MultiSelectionDialogs
         self.pyfunc.update_calender_selection.connect(self.new_cal_selection)
 
-	# reagiert auf drücken des "Start"/"Update" Buttons und bindet an
-	self.pyfunc.start.connect(self.start)
+        # reagiert auf drücken des "Start"/"Update" Buttons und bindet an
+        self.pyfunc.start.connect(self.start)
 
         # Startbutton soll daemon starten, der im hintergund weiterläuft
         #self.pyfunc.start.connect(self.start_daemon)
 
-	# reagiert (nur) auf Update-Button - aktualisiert den Feed!
-	self.pyfunc.update_feed.connect(self.update_feed) 
-
-	#löscht den Termine-Feed
-	self.pyfunc.delete_feed.connect(self.delete_feed)
+        # reagiert (nur) auf Update-Button - aktualisiert den Feed!
+        self.pyfunc.update_feed.connect(self.update_feed) 
 
         #löscht den Termine-Feed
-	self.pyfunc.update_show_events_max.connect(self.update_show_events_max)
+        self.pyfunc.delete_feed.connect(self.delete_feed)
+
+        #löscht den Termine-Feed
+        self.pyfunc.update_show_events_max.connect(self.update_show_events_max)
 
         self.pyfunc.update_next_event_on_top.connect(self.update_next_event_on_top)
 
-	# Config stuff
+        # Config stuff
         self.config = ConfigParser.ConfigParser()
         if os.path.exists(os.path.expanduser('~/.config/dateevent.cfg')):
             self.readconf()
@@ -86,18 +86,22 @@ class CalEvent(QtCore.QObject):
             self.root.set_startupdate("True")
         
         #expose the object to QML
-	self.context = self.view.rootContext()
-	self.context.setContextProperty("pyfunc", self.pyfunc)
+        self.context = self.view.rootContext()
+        self.context.setContextProperty("pyfunc", self.pyfunc)
         self.context.setContextProperty("calendars", self.calendar_names)
         self.context.setContextProperty("selected_calendars", self.selected_calendars)
         self.context.setContextProperty("next_event_on_top", self.next_event_on_top)
         self.context.setContextProperty("show_events_max", self.show_events_max)
         self.context.setContextProperty("choice_days_ahead", self.choice_days_ahead)
         self.context.setContextProperty("choice_show_max_events", self.choice_show_max_events)
+
+        print self.next_event_on_top
+        print type(self.next_event_on_top)
+        self.root.set_nextontop_slider(self.next_event_on_top)
         self.root.set_dayamount(self.selected_dayamount)
-	self.root.set_maxevents(self.show_events_max)
+        self.root.set_maxevents(self.show_events_max)
         #self.slider = self.root.findChild(QtCore.QObject,"chronik_slider")
-        #self.slider.clicked.connect(self.update_next_event_on_top)
+        #self.slider.clicked.connect(self.update_next_event_on_top) # vorher clicked
         
         #dbus
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
@@ -111,9 +115,6 @@ class CalEvent(QtCore.QObject):
         except dbus.DBusException:
             print_exc()
             sys.exit(1)
-                
-        #moved into daemon
-        #self.iface.connect_to_signal("GraphUpdated", self.calendar_db_changed)
 
 #-------------------------------------------------------------------------
 # config-methods
@@ -132,8 +133,9 @@ class CalEvent(QtCore.QObject):
                                                       'selected_dayamount'))
             self.selected_calendars = list(eval(self.config.get('General', 
                                                       'selected_calendars')))
-            self.next_event_on_top = eval(self.config.get('General',
+            self.next_event_on_top = str(self.config.get('General',
                                                      'next_event_on_top'))
+            print self.next_event_on_top
             self.show_events_max = int(self.config.get('General', 
                                                       'show_events_max'))
 
@@ -144,7 +146,7 @@ class CalEvent(QtCore.QObject):
 
     def delete_feed(self):
         service = EventFeedService('dateevent', 'DateEvent')
-	service.remove_items()
+        service.remove_items()
 
     def calendar_db_changed(self, arg1, arg2, arg3):
         if arg1 =='http://www.semanticdesktop.org/ontologies/2007/04/02/ncal#Event':
@@ -175,13 +177,15 @@ class CalEvent(QtCore.QObject):
         self.save_config()
 
     def update_next_event_on_top(self,value):
+        print "slider update"
         self.next_event_on_top = value
+        print self.next_event_on_top
         self.config.set('General', 'next_event_on_top', value)
         self.save_config()
 
-	#Vielleicht unnötig! :)
+        #Vielleicht unnötig! :)
     def start(self, new_dayamount):
-	self.get_events(new_dayamount, self.selected_calendars, self.show_events_max)
+        self.get_events(new_dayamount, self.selected_calendars, self.show_events_max)
 
     def start_daemon(self):
         daemon = QtCore.QProcess(parent)
@@ -192,7 +196,7 @@ class CalEvent(QtCore.QObject):
         conn = connect("/home/user/.calendar/db")
         curs = conn.cursor()
         # SQL-Abfrage für alle Kalender 
-	query_calendars = "SELECT CalendarId,Name,Color\
+        query_calendars = "SELECT CalendarId,Name,Color\
                            FROM Calendars\
                            WHERE modifiedDate > 1306879230"
         # SQL-Abfrage durchführen und Ergebnisse ausgeben
@@ -216,42 +220,42 @@ class CalEvent(QtCore.QObject):
         return calendar_ids
 
     def get_events(self, dayamount, calendar_ids, show_events_max):
-	# verbindung zur sqlite-db
-	conn = connect("/home/user/.calendar/db")
-	curs = conn.cursor()
-	# nächsten tage, die abgefragt werden sollen
-	days_ahead = int(self.choice_days_ahead[int(dayamount)])
+        # verbindung zur sqlite-db
+        conn = connect("/home/user/.calendar/db")
+        curs = conn.cursor()
+        # nächsten tage, die abgefragt werden sollen
+        days_ahead = int(self.choice_days_ahead[int(dayamount)])
         print show_events_max
         # calendars
         selected_calender = [self.all_calendars[i][0] for i in calendar_ids]
         selected_calender = unicode("','".join(selected_calender))
-	# unix zeit von heute 
-	unixtime_now = int(time())
-	unixtime_in_days_ahead = unixtime_now + days_ahead*86400
+        # unix zeit von heute 
+        unixtime_now = int(time())
+        unixtime_in_days_ahead = unixtime_now + days_ahead*86400
 
-	# SQL-Abfrage der Events nur für die ausgewählten Kalender
+        # SQL-Abfrage der Events nur für die ausgewählten Kalender
         # zweite Datestartabfrage für die faketime
-	query_events = "SELECT Summary, Location, DateStart, Notebook, DateStart FROM Components \
-               		WHERE DateStart BETWEEN {0} AND {1}\
-               		AND Notebook in ('{2}')\
-               		AND DateDeleted = '0'".format(unixtime_now,
+        query_events = "SELECT Summary, Location, DateStart, Notebook, DateStart FROM Components \
+                    WHERE DateStart BETWEEN {0} AND {1}\
+                    AND Notebook in ('{2}')\
+                    AND DateDeleted = '0'".format(unixtime_now,
                                                       unixtime_in_days_ahead,
                                                       selected_calender)
-	curs.execute(query_events)
-	all_events = curs.fetchall()
+        curs.execute(query_events)
+        all_events = curs.fetchall()
         print all_events
 
         if self.next_event_on_top:
             all_events = self.change_events_timeline(all_events)
 
-	for summary, location, datestart, cal, faketime in all_events[:self.show_events_max]:
+        for summary, location, datestart, cal, faketime in all_events[:self.show_events_max]:
             calId = self.calendar_ids.index(cal)
             faketime = datetime.fromtimestamp(faketime)
             datestart = datetime.fromtimestamp(datestart)
             day = int(str(datestart)[8:10])	
             self.feeder(summary, location, faketime, day, calId)
         # Verbindung zur DB beenden
-	conn.close()
+        conn.close()
 
     def change_events_timeline(self, events):
         events = sorted(events, key = lambda event: event[2])
@@ -276,16 +280,16 @@ class CalEvent(QtCore.QObject):
              icon = '/usr/share/dateevent/img/icon-l-calendar-{0}.png'.format(day)
         else:
              icon = '/home/user/MyDocs/dateevent/img/icon-l-calendar-{0}.png'.format(day)
-	
+
         item = EventFeedItem(icon,
                u'Termin aus Kalender: <font color="{0}">{1}</font>'.format(calendarcolor,calendarname),
                datestart) 
         #gültiger Timestamp: datetime.datetime(2011, 11, 02, 8, 30, 0, 0)		
         item.set_body(summary)
-	item.set_footer(location)
-		
-	item.set_custom_action(self.on_item_clicked)
-	service.add_item(item)
+        item.set_footer(location)
+
+        item.set_custom_action(self.on_item_clicked)
+        service.add_item(item)
 
 #--------------------------------------------------------------------------------------------------
 
@@ -297,8 +301,8 @@ class CalEvent(QtCore.QObject):
 
 #--------------------------------------------------------------------------------------------------
 
-	# Muss ausgelagert werden in den zukünftigen "Deamon",
-	# sonst wird es logischer Weise mit beendet - dann gibt es keine Reaktion mehr!
+    # Muss ausgelagert werden in den zukünftigen "Deamon",
+    # sonst wird es logischer Weise mit beendet - dann gibt es keine Reaktion mehr!
     def on_item_clicked(self):
         print 'the user clicked the item'
         subprocess.Popen(['/usr/bin/organiser'])

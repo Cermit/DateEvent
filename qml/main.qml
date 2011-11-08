@@ -8,15 +8,21 @@ PageStackWindow {
     function set_startupdate(str) {
         if (str === "True"){mainPage.setstartupdatetext = qsTr("Start")}
         else {mainPage.setstartupdatetext = qsTr("manuelles Update")}
-		}
+        }
 
     function set_dayamount(number) {
-	mainPage.setdayamountindex = number
-	}
+    mainPage.setdayamountindex = number
+    }
 
     function set_maxevents(number) {
-	mainPage.setmaxevents = number
-	}
+    mainPage.setmaxevents = number
+    }
+
+    function set_nextontop_slider(str) {
+        console.log("slider wird gesetzt")
+        if (str === "True") {mainPage.setnextontopslider = true}
+        else {mainPage.setnextontopslider = false}
+        }
 
     MainPage {
         id: mainPage
