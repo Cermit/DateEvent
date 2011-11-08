@@ -30,8 +30,8 @@ class CalEvent(QtCore.QObject):
         self.view = QtDeclarative.QDeclarativeView()
 
         #OpenGL Rendering
-        #self.glw = QtOpenGL.QGLWidget()
-        #self.view.setViewport(self.glw)
+        self.glw = QtOpenGL.QGLWidget()
+        self.view.setViewport(self.glw)
 
         if os.path.exists('/usr/share/dateevent/qml'):
              self.view.setSource('/usr/share/dateevent/qml/main.qml')
