@@ -25,6 +25,7 @@ class CalEventDaemon(QtCore.QObject):
         self.calendar_ids = self.get_calendar_ids(self.all_calendars)
         self.choice_days_ahead = ['1','2','3','4','5','6','7','14','30']
         self.choice_show_max_events = ['1','2','3','4','5']
+
 	# Config stuff
         self.config = ConfigParser.ConfigParser()
         if os.path.exists(os.path.expanduser('~/.config/dateevent.cfg')):
@@ -32,6 +33,10 @@ class CalEventDaemon(QtCore.QObject):
         else:
             self.defaultconf()
             self.readconf()
+
+        self.timer = QtCore.QTimer()
+        self.timer.setSingleShot(True)
+  
         #dbus
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
         self.bus = dbus.SessionBus()
@@ -46,6 +51,9 @@ class CalEventDaemon(QtCore.QObject):
             sys.exit(1)
                 
         self.iface.connect_to_signal("GraphUpdated", self.calendar_db_changed)
+        self.timer.timeout.connect(self.update_neu)
+
+        self.update_feed(self.selected_dayamount)
 
 #-------------------------------------------------------------------------
 # config-methods
@@ -114,6 +122,10 @@ class CalEventDaemon(QtCore.QObject):
     def start(self, new_dayamount):
 	self.get_events(new_dayamount, self.selected_calendars, self.show_events_max)
 
+    def update_neu(self):
+        print "jetzt wird ein update durchgeführt"
+        self.update_feed(self.selected_dayamount)
+
     def get_calendars(self):
         # verbindung zur sqlite-db
         conn = connect("/home/user/.calendar/db")
@@ -146,12 +158,13 @@ class CalEventDaemon(QtCore.QObject):
 	curs = conn.cursor()
 	# nächsten tage, die abgefragt werden sollen
 	days_ahead = int(self.choice_days_ahead[int(dayamount)])
-        print show_events_max
+        #print show_events_max
         # calendars
         selected_calender = [self.all_calendars[i][0] for i in calendar_ids]
         selected_calender = unicode("','".join(selected_calender))
-	# unix zeit von heute 
-	unixtime_now = int(time())
+	# unix zeit von heute + 5 Sekunden wg Timer beim Daemon
+	unixtime_now = int(time()) + 5
+        print "in get_events:", unixtime_now
 	unixtime_in_days_ahead = unixtime_now + days_ahead*86400
 
 	# SQL-Abfrage der Events nur für die ausgewählten Kalender
@@ -163,13 +176,14 @@ class CalEventDaemon(QtCore.QObject):
                                                       unixtime_in_days_ahead,
                                                       selected_calender)
 	curs.execute(query_events)
-	all_events = curs.fetchall()
-        print all_events
+	self.all_events = curs.fetchall()
+        self.all_events = sorted(self.all_events, key = lambda event: event[2])
+        print self.all_events
 
         if self.next_event_on_top:
-            all_events = self.change_events_timeline(all_events)
+            self.all_events = self.change_events_timeline(self.all_events)
 
-	for summary, location, datestart, cal, faketime in all_events[:self.show_events_max]:
+	for summary, location, datestart, cal, faketime in self.all_events[:self.show_events_max]:
             calId = self.calendar_ids.index(cal)
             faketime = datetime.fromtimestamp(faketime)
             datestart = datetime.fromtimestamp(datestart)
@@ -179,7 +193,6 @@ class CalEventDaemon(QtCore.QObject):
 	conn.close()
 
     def change_events_timeline(self, events):
-        events = sorted(events, key = lambda event: event[2])
         time_last_event = events[-1][2]
         for i, event in enumerate(events):
             events[i] = list(event)
@@ -215,11 +228,19 @@ class CalEventDaemon(QtCore.QObject):
 #--------------------------------------------------------------------------------------------------
 
     def update_feed(self, dayamount):
-        print "machen wir mal nur ein Update!"		
+        print "machen wir mal ein Update!"		
         service = EventFeedService('dateevent', 'DateEvent')
         service.remove_items()
         self.readconf()
         self.get_events(dayamount,self.selected_calendars, self.show_events_max)
+        print "Zeit Jetzt:", time()
+        print "Zeit nächster Termin:", self.all_events[0][2]
+        print "Zeit bis zum nächsten Termin:" , self.all_events[0][2]-time()
+        if self.timer.isActive():
+            self.timer.stop()
+        print "bin hier"
+        self.timer.setInterval((self.all_events[0][2]-time())*1000)
+        self.timer.start()
 
 #--------------------------------------------------------------------------------------------------
 
