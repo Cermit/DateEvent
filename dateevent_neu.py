@@ -94,15 +94,10 @@ class CalEvent(QtCore.QObject):
         self.context.setContextProperty("show_events_max", self.show_events_max)
         self.context.setContextProperty("choice_days_ahead", self.choice_days_ahead)
         self.context.setContextProperty("choice_show_max_events", self.choice_show_max_events)
-
-        print self.next_event_on_top
-        print type(self.next_event_on_top)
-        self.root.set_nextontop_slider(self.next_event_on_top)
         self.root.set_dayamount(self.selected_dayamount)
         self.root.set_maxevents(self.show_events_max)
-        #self.slider = self.root.findChild(QtCore.QObject,"chronik_slider")
-        #self.slider.clicked.connect(self.update_next_event_on_top) # vorher clicked
-        
+        self.root.set_nextontop_slider(self.next_event_on_top)
+
         #dbus
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
         self.bus = dbus.SessionBus()
@@ -123,8 +118,8 @@ class CalEvent(QtCore.QObject):
             self.config.set('General', 'selected_dayamount', '2')
             self.config.set('General', 'selected_calendars', [])
             self.config.set('General', 'next_event_on_top', 'True')
-            self.config.set('General', 'show_events_max', '5')
-            self.save_config()      
+            self.config.set('General', 'show_events_max', '0')
+            self.save_config()
 
     def readconf(self):
             self.config.readfp(open(os.path.expanduser(
@@ -135,9 +130,9 @@ class CalEvent(QtCore.QObject):
                                                       'selected_calendars')))
             self.next_event_on_top = str(self.config.get('General',
                                                      'next_event_on_top'))
-            print self.next_event_on_top
             self.show_events_max = int(self.config.get('General', 
                                                       'show_events_max'))
+            print self.show_events_max
 
     def save_config(self):
         with open(os.path.expanduser('~/.config/dateevent.cfg'), 'wb') as configfile:

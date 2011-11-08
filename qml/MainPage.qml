@@ -98,8 +98,7 @@ Page {
 
         onClicked: {            
             JS.create_listview_max_events(choice_show_max_events)
-        console.log(dialog_items.model.ListElement.name)
-        dialog_items.open()
+            dialog_items.open()
         }
 
         Image {
@@ -120,7 +119,6 @@ Page {
                 anchors {verticalCenter: parent.verticalCenter; left: parent.right; leftMargin: 20}
 
                 onCheckedChanged: {
-                    console.log("Switch betaetigt")
                     pyfunc.update_next_event_on_top(chronik_slider.checked)
                 }
             }
@@ -134,7 +132,7 @@ Page {
 
         onClicked: {
             if(startupdate.text == qsTr("Start")){pyfunc.start(dialog_days.selectedIndex); startupdate.text = qsTr("manuelles Update")}
-        else{pyfunc.update_feed(dialog_days.selectedIndex)}
+            else{pyfunc.update_feed(dialog_days.selectedIndex)}
 
         pyfunc.new_dayamount(String(dialog_days.selectedIndex))
         }
@@ -159,21 +157,22 @@ Page {
     SelectionDialog {
         id: dialog_days
         titleText: qsTr("Anzahl Tage:")
-        selectedIndex: 1
 
         model: ListModel {
             id: days_listmodel
-            }
+            //ListElement { name: "Placeholder for Python list element" }
+}
     }
 
     SelectionDialog {
         id: dialog_items
         titleText: qsTr("Anzahl Termine:")
-        selectedIndex: 1
-
+        selectedIndex: 0
         model: ListModel {
             id: items_listmodel
-            }
+            //ListElement { name: "Placeholder for Python list element" }
+}
+
         onAccepted: {
             pyfunc.update_show_events_max(String(dialog_items.selectedIndex))
             }

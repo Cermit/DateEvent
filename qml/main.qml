@@ -10,16 +10,15 @@ PageStackWindow {
         else {mainPage.setstartupdatetext = qsTr("manuelles Update")}
         }
 
-    function set_dayamount(number) {
-    mainPage.setdayamountindex = number
-    }
+    function set_dayamount(num) {
+        mainPage.setdayamountindex = num
+        }
 
-    function set_maxevents(number) {
-    mainPage.setmaxevents = number
-    }
+    function set_maxevents(num) {
+        mainPage.setmaxevents = num
+        }
 
     function set_nextontop_slider(str) {
-        console.log("slider wird gesetzt")
         if (str === "True") {mainPage.setnextontopslider = true}
         else {mainPage.setnextontopslider = false}
         }
