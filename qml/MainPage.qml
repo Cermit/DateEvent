@@ -115,8 +115,14 @@ Page {
 
             Switch {
                 id: chronik_slider
+                objectName : "chronik_slider"
                 anchors {verticalCenter: parent.verticalCenter; left: parent.right; leftMargin: 20}
                 checked: true
+
+                onCheckedChanged: {
+                    console.log("Switch betaetigt")
+                    pyfunc.update_next_event_on_top(chronik_slider.checked)
+                }
             }
         }
 

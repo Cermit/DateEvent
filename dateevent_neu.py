@@ -68,6 +68,8 @@ class CalEvent(QtCore.QObject):
         #löscht den Termine-Feed
 	self.pyfunc.update_show_events_max.connect(self.update_show_events_max)
 
+        self.pyfunc.update_next_event_on_top.connect(self.update_next_event_on_top)
+
 	# Config stuff
         self.config = ConfigParser.ConfigParser()
         if os.path.exists(os.path.expanduser('~/.config/dateevent.cfg')):
@@ -91,6 +93,8 @@ class CalEvent(QtCore.QObject):
         self.context.setContextProperty("choice_show_max_events", self.choice_show_max_events)
         self.root.set_dayamount(self.selected_dayamount)
 	self.root.set_maxevents(self.show_events_max)
+        #self.slider = self.root.findChild(QtCore.QObject,"chronik_slider")
+        #self.slider.clicked.connect(self.update_next_event_on_top)
         
         #dbus
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
@@ -164,6 +168,11 @@ class CalEvent(QtCore.QObject):
     def update_show_events_max(self, index):
         self.show_events_max = int(self.choice_show_max_events[int(index)])
         self.config.set('General', 'show_events_max', self.choice_show_max_events[int(index)])
+        self.save_config()
+
+    def update_next_event_on_top(self,value):
+        self.next_event_on_top = value
+        self.config.set('General', 'next_event_in_top', value)
         self.save_config()
 
 	#Vielleicht unnötig! :)
@@ -296,6 +305,7 @@ class pyfunc(QtCore.QObject):
     update_calender_selection = QtCore.Signal(str)
     update_show_events_max = QtCore.Signal(str)
     update_feed = QtCore.Signal(str)
+    update_next_event_on_top = QtCore.Signal(bool)
 
     def __init__(self):
         QtCore.QObject.__init__(self)
