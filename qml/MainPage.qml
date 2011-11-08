@@ -9,6 +9,7 @@ Page {
 
     property alias setstartupdatetext: startupdate.text
     property alias setdayamountindex: dialog_days.selectedIndex
+    property alias setmaxevents: dialog_items.selectedIndex
     property alias infoDialog: infoDialog
     property alias resetDialog: resetDialog
 
@@ -95,8 +96,9 @@ Page {
         text: qsTr("Auswahl Anzahl")
 
         onClicked: {            
-            dialog_items.open()
             JS.create_listview_max_events(choice_show_max_events)
+	    console.log(dialog_items.model.ListElement.name)
+	    dialog_items.open()
         }
 
         Image {
@@ -151,7 +153,7 @@ Page {
     SelectionDialog {
         id: dialog_days
         titleText: qsTr("Anzahl Tage:")
-        selectedIndex: -1
+        selectedIndex: 0
 
         model: ListModel {
             id: days_listmodel
@@ -161,11 +163,11 @@ Page {
     SelectionDialog {
         id: dialog_items
         titleText: qsTr("Anzahl Termine:")
-        selectedIndex: -1
+	selectedIndex: 0	
 
         model: ListModel {
             id: items_listmodel
-        }
+            }
     }
 
     QueryDialog {

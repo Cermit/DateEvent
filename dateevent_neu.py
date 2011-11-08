@@ -30,8 +30,8 @@ class CalEvent(QtCore.QObject):
         self.view = QtDeclarative.QDeclarativeView()
 
         #OpenGL Rendering
-        self.glw = QtOpenGL.QGLWidget()
-        self.view.setViewport(self.glw)
+        #self.glw = QtOpenGL.QGLWidget()
+        #self.view.setViewport(self.glw)
 
         if os.path.exists('/usr/share/dateevent/qml'):
              self.view.setSource('/usr/share/dateevent/qml/main.qml')
@@ -87,6 +87,7 @@ class CalEvent(QtCore.QObject):
         self.context.setContextProperty("choice_days_ahead", self.choice_days_ahead)
         self.context.setContextProperty("choice_show_max_events", self.choice_show_max_events)
         self.root.set_dayamount(self.selected_dayamount)
+	self.root.set_maxevents(self.show_events_max)
         
         #dbus
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)

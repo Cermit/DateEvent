@@ -14,6 +14,10 @@ PageStackWindow {
 	mainPage.setdayamountindex = number
 	}
 
+    function set_maxevents(number) {
+	mainPage.setmaxevents = number
+	}
+
     MainPage {
         id: mainPage
     }
