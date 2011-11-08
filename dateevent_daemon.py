@@ -6,8 +6,6 @@ import sys
 if os.path.exists('/usr/share/dateevent'):
     sys.path.append("/usr/share/dateevent")
 import ConfigParser
-# kann raus, wenn config läuft
-import pickle
 import subprocess
 import dbus
 import dbus.mainloop.glib
@@ -16,89 +14,24 @@ from time import time
 from datetime import datetime
 from eventfeed import EventFeedService, EventFeedItem
 from PySide import QtCore
-from PySide.QtCore import Qt
 from PySide import QtGui
-from PySide import QtDeclarative
 
-#OpenGL Rendering
-from PySide import QtOpenGL
-
-class CalEvent(QtCore.QObject):
+class CalEventDaemon(QtCore.QObject):
     def __init__(self):
         QtCore.QObject.__init__(self)
-        #Oberfläche und Instanzierungen für QML2Py Funktionen
-        self.view = QtDeclarative.QDeclarativeView()
-
-        #OpenGL Rendering
-        self.glw = QtOpenGL.QGLWidget()
-        self.view.setViewport(self.glw)
-
-        if os.path.exists('/usr/share/dateevent/qml'):
-             self.view.setSource('/usr/share/dateevent/qml/main.qml')
-        else:
-             self.view.setSource(os.path.join('qml','main.qml'))
-
-        self.root = self.view.rootObject()
-
         # set data
         self.all_calendars = self.get_calendars()
         self.calendar_names = self.get_calendar_names(self.all_calendars)
         self.calendar_ids = self.get_calendar_ids(self.all_calendars)
         self.choice_days_ahead = ['1','2','3','4','5','6','7','14','30']
         self.choice_show_max_events = ['1','2','3','4','5']
-        #instantiate the Python object
-	self.pyfunc = pyfunc()
-
-	# Reagiert auf UpdateButton und ruft Klasse auf,
-	# welche die gewählte Tageszahl speichert
-	self.pyfunc.new_dayamount.connect(self.new_dayamount)
-
-        # reagiert auf onAccepted des MultiSelectionDialogs
-        self.pyfunc.update_calender_selection.connect(self.new_cal_selection)
-
-	# reagiert auf drücken des "Start"/"Update" Buttons und bindet an
-	self.pyfunc.start.connect(self.start)
-
-        # Startbutton soll daemon starten, der im hintergund weiterläuft
-        #self.pyfunc.start.connect(self.start_daemon)
-
-	# reagiert (nur) auf Update-Button - aktualisiert den Feed!
-	self.pyfunc.update_feed.connect(self.update_feed) 
-
-	#löscht den Termine-Feed
-	self.pyfunc.delete_feed.connect(self.delete_feed)
-
-        #löscht den Termine-Feed
-	self.pyfunc.update_show_events_max.connect(self.update_show_events_max)
-
-        self.pyfunc.update_next_event_on_top.connect(self.update_next_event_on_top)
-
 	# Config stuff
         self.config = ConfigParser.ConfigParser()
         if os.path.exists(os.path.expanduser('~/.config/dateevent.cfg')):
             self.readconf()
-            # startbutton "manuelles Update" in QML
-            self.root.set_startupdate("False")
         else:
             self.defaultconf()
             self.readconf()
-            # startbutton "Start" in QML
-            self.root.set_startupdate("True")
-        
-        #expose the object to QML
-	self.context = self.view.rootContext()
-	self.context.setContextProperty("pyfunc", self.pyfunc)
-        self.context.setContextProperty("calendars", self.calendar_names)
-        self.context.setContextProperty("selected_calendars", self.selected_calendars)
-        self.context.setContextProperty("next_event_on_top", self.next_event_on_top)
-        self.context.setContextProperty("show_events_max", self.show_events_max)
-        self.context.setContextProperty("choice_days_ahead", self.choice_days_ahead)
-        self.context.setContextProperty("choice_show_max_events", self.choice_show_max_events)
-        self.root.set_dayamount(self.selected_dayamount)
-	self.root.set_maxevents(self.show_events_max)
-        #self.slider = self.root.findChild(QtCore.QObject,"chronik_slider")
-        #self.slider.clicked.connect(self.update_next_event_on_top)
-        
         #dbus
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
         self.bus = dbus.SessionBus()
@@ -112,8 +45,7 @@ class CalEvent(QtCore.QObject):
             print_exc()
             sys.exit(1)
                 
-        #moved into daemon
-        #self.iface.connect_to_signal("GraphUpdated", self.calendar_db_changed)
+        self.iface.connect_to_signal("GraphUpdated", self.calendar_db_changed)
 
 #-------------------------------------------------------------------------
 # config-methods
@@ -149,9 +81,8 @@ class CalEvent(QtCore.QObject):
     def calendar_db_changed(self, arg1, arg2, arg3):
         if arg1 =='http://www.semanticdesktop.org/ontologies/2007/04/02/ncal#Event':
             print "kalender-db verändert, update event-screen"
-            self.update_feed(6)
+            self.update_feed(self.selected_dayamount)
 
-           
     #Speichert geänderte Werte bei der Anzahl der Tage
     def new_dayamount(self, new_dayamount):
         self.selected_dayamount = int(new_dayamount) 
@@ -183,10 +114,6 @@ class CalEvent(QtCore.QObject):
     def start(self, new_dayamount):
 	self.get_events(new_dayamount, self.selected_calendars, self.show_events_max)
 
-    def start_daemon(self):
-        daemon = QtCore.QProcess(parent)
-        # TODO
-
     def get_calendars(self):
         # verbindung zur sqlite-db
         conn = connect("/home/user/.calendar/db")
@@ -211,8 +138,6 @@ class CalEvent(QtCore.QObject):
         calendar_ids = []
         for calId, name, color in calendarlist:
             calendar_ids.append(calId)
-        print "cal-ids:"
-        print calendar_ids
         return calendar_ids
 
     def get_events(self, dayamount, calendar_ids, show_events_max):
@@ -293,6 +218,7 @@ class CalEvent(QtCore.QObject):
         print "machen wir mal nur ein Update!"		
         service = EventFeedService('dateevent', 'DateEvent')
         service.remove_items()
+        self.readconf()
         self.get_events(dayamount,self.selected_calendars, self.show_events_max)
 
 #--------------------------------------------------------------------------------------------------
@@ -305,23 +231,8 @@ class CalEvent(QtCore.QObject):
 
 #--------------------------------------------------------------------------------------------------
 
-# Klasse für Funktionen die aus QML heraus angesprochen werden sollen:
-class pyfunc(QtCore.QObject):
-    start = QtCore.Signal(str)
-    delete_feed = QtCore.Signal()
-    new_dayamount = QtCore.Signal(str)
-    update_calender_selection = QtCore.Signal(str)
-    update_show_events_max = QtCore.Signal(str)
-    update_feed = QtCore.Signal(str)
-    update_next_event_on_top = QtCore.Signal(bool)
-
-    def __init__(self):
-        QtCore.QObject.__init__(self)
-
 #Starten der App
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
-    start = CalEvent()
-    start.view.showFullScreen()
+    start = CalEventDaemon()
     sys.exit(app.exec_())
-
