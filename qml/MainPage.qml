@@ -51,7 +51,7 @@ Page {
         text: qsTr("Auswahl Tage")
 
         onClicked: {
-            JS.create_listview_days_ahead(choice_days_ahead)
+            //JS.create_listview_days_ahead(choice_days_ahead)
             dialog_days.open()
         }
 
@@ -97,7 +97,7 @@ Page {
         text: qsTr("Auswahl Anzahl")
 
         onClicked: {            
-            JS.create_listview_max_events(choice_show_max_events)
+            //JS.create_listview_max_events(choice_show_max_events)
             dialog_items.open()
         }
 
@@ -158,8 +158,16 @@ Page {
 
         model: ListModel {
             id: days_listmodel
-            //ListElement { name: "Placeholder for Python list element" }
-}
+            ListElement { name: "1" }
+            ListElement { name: "2" }
+            ListElement { name: "3" }
+            ListElement { name: "4" }
+            ListElement { name: "5" }
+            ListElement { name: "6" }
+            ListElement { name: "7" }
+            ListElement { name: "14" }
+            ListElement { name: "30" }
+            }
 
         onAccepted: {
             pyfunc.new_dayamount(String(dialog_days.selectedIndex))
@@ -173,7 +181,13 @@ Page {
 
         model: ListModel {
             id: items_listmodel
-            //ListElement { name: "Placeholder for Python list element" }
+            ListElement { name: "1" }
+            ListElement { name: "2" }
+            ListElement { name: "3" }
+            ListElement { name: "4" }
+            ListElement { name: "5" }
+            ListElement { name: "7" }
+            ListElement { name: "10" }
 }
 
         onAccepted: {
