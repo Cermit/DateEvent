@@ -45,7 +45,7 @@ class CalEvent(QtCore.QObject):
         self.calendar_names = self.get_calendar_names(self.all_calendars)
         self.calendar_ids = self.get_calendar_ids(self.all_calendars)
         self.choice_days_ahead = ['1','2','3','4','5','6','7','14','30']
-        self.choice_show_max_events = ['1','2','3','4','5']
+        self.choice_show_max_events = ['1','2','3','4','5','7','10']
         #instantiate the Python object
         self.pyfunc = pyfunc()
 
@@ -181,7 +181,7 @@ class CalEvent(QtCore.QObject):
         self.show_events_max = int(index)#(self.choice_show_max_events[int(index)])
         print self.show_events_max
         print type(self.show_events_max)
-        self.config.set('General', 'show_events_max', index)#self.choice_show_max_events[int(index)-1])
+        self.config.set('General', 'show_events_max', self.choice_show_max_events[int(index)])
         print self.config.get('General', 'show_events_max')
         print type(self.config.get('General', 'show_events_max'))
         self.save_config()
