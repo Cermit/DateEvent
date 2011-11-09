@@ -12,7 +12,8 @@ setup(name="dateevent",
       description="A PySide example",
       long_description=read('dateevent.longdesc'),
       data_files=[('share/applications',['dateevent.desktop']),
+                  ('share/applications',['dateevent_daemon']),
                   ('share/icons/hicolor/64x64/apps', ['dateevent.png']),
                   ('share/dateevent/qml', glob.glob('qml/*.*')),
                   ('share/dateevent/img', glob.glob('img/*.png')),
-                   ('share/dateevent',['eventfeed.py']),],)
+                  ('share/dateevent',['eventfeed.py']),],)
