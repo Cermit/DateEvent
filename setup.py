@@ -6,10 +6,10 @@ def read(fname):
 
 setup(name="dateevent",
       scripts=['dateevent'],
-      version='0.1.0',
+      version='0.2.0',
       maintainer="Gabriel Boehme and Boris Pohler",
-      maintainer_email="email@example.com",
-      description="A PySide example",
+      maintainer_email="m.gabrielboehme@googlemail.com",
+      description="DateEvent",
       long_description=read('dateevent.longdesc'),
       data_files=[('share/applications',['dateevent.desktop']),
                   ('bin/',['dateevent_daemon']),
