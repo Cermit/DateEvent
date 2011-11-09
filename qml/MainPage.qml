@@ -133,9 +133,7 @@ Page {
         onClicked: {
             if(startupdate.text == qsTr("Start")){pyfunc.start(dialog_days.selectedIndex); startupdate.text = qsTr("manuelles Update")}
             else{pyfunc.update_feed(dialog_days.selectedIndex)}
-
-        pyfunc.new_dayamount(String(dialog_days.selectedIndex))
-        }
+            }
     }
 
     MultiSelectionDialog {
@@ -162,12 +160,17 @@ Page {
             id: days_listmodel
             //ListElement { name: "Placeholder for Python list element" }
 }
+
+        onAccepted: {
+            pyfunc.new_dayamount(String(dialog_days.selectedIndex))
+        }
     }
 
     SelectionDialog {
         id: dialog_items
         titleText: qsTr("Anzahl Termine:")
         selectedIndex: 0
+
         model: ListModel {
             id: items_listmodel
             //ListElement { name: "Placeholder for Python list element" }

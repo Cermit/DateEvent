@@ -91,7 +91,7 @@ class CalEvent(QtCore.QObject):
         self.context.setContextProperty("calendars", self.calendar_names)
         self.context.setContextProperty("selected_calendars", self.selected_calendars)
         self.context.setContextProperty("next_event_on_top", self.next_event_on_top)
-        self.context.setContextProperty("show_events_max", self.show_events_max)
+#        self.context.setContextProperty("show_events_max", self.show_events_max)
         self.context.setContextProperty("choice_days_ahead", self.choice_days_ahead)
         self.context.setContextProperty("choice_show_max_events", self.choice_show_max_events)
         self.root.set_dayamount(self.selected_dayamount)
@@ -167,8 +167,14 @@ class CalEvent(QtCore.QObject):
         self.save_config()
 
     def update_show_events_max(self, index):
-        self.show_events_max = int(self.choice_show_max_events[int(index)])
-        self.config.set('General', 'show_events_max', self.choice_show_max_events[int(index)])
+        print index
+        print type(index)
+        self.show_events_max = int(index)#(self.choice_show_max_events[int(index)])
+        print self.show_events_max
+        print type(self.show_events_max)
+        self.config.set('General', 'show_events_max', index)#self.choice_show_max_events[int(index)-1])
+        print self.config.get('General', 'show_events_max')
+        print type(self.config.get('General', 'show_events_max'))
         self.save_config()
 
     def update_next_event_on_top(self,value):
