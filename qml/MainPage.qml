@@ -48,10 +48,9 @@ Page {
     Button {
         id: dayamount_combo
         anchors {top: parent.top; topMargin: 180; horizontalCenter: parent.horizontalCenter}
-        text: qsTr("Auswahl Tage")
+        text: dialog_days.model.get(dialog_days.selectedIndex).name
 
         onClicked: {
-            //JS.create_listview_days_ahead(choice_days_ahead)
             dialog_days.open()
         }
 
@@ -94,10 +93,9 @@ Page {
     Button {
         id: itemsAmount_combo
         anchors {top: parent.top; topMargin: 420; horizontalCenter: parent.horizontalCenter}
-        text: qsTr("Auswahl Anzahl")
+        text: dialog_items.model.get(dialog_items.selectedIndex).name
 
         onClicked: {            
-            //JS.create_listview_max_events(choice_show_max_events)
             dialog_items.open()
         }
 
@@ -109,7 +107,7 @@ Page {
 
     Text {
         id: chroniktext
-        anchors {top: parent.top; topMargin: 540; left: parent.left; leftMargin: 20}
+        anchors {top: parent.top; topMargin: 500; left: parent.left; leftMargin: 20}
         text: qsTr("Nächste Termine zuerst zeigen:")
         font {pixelSize: 24}
 
@@ -123,6 +121,15 @@ Page {
                 }
             }
         }
+
+    Button {
+        id: daemonbutton
+        objectName: "daemonbutton" //for PySide binding
+        anchors {top: parent.top; topMargin: 575; horizontalCenter: parent.horizontalCenter}
+        text: qsTr("Daemon starten")
+
+        onClicked: {}
+    }
 
     Button {
         id: startupdate
@@ -155,6 +162,7 @@ Page {
     SelectionDialog {
         id: dialog_days
         titleText: qsTr("Anzahl Tage:")
+        selectedIndex: 0
 
         model: ListModel {
             id: days_listmodel
