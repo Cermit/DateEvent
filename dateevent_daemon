@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 #-*- coding: utf-8 -*-
 
 import os
@@ -15,6 +15,7 @@ from datetime import datetime
 from eventfeed import EventFeedService, EventFeedItem
 from PySide import QtCore
 from PySide import QtGui
+from daemon import Daemon
 
 class CalEventDaemon(QtCore.QObject):
     def __init__(self):
@@ -24,9 +25,9 @@ class CalEventDaemon(QtCore.QObject):
         self.calendar_names = self.get_calendar_names(self.all_calendars)
         self.calendar_ids = self.get_calendar_ids(self.all_calendars)
         self.choice_days_ahead = ['1','2','3','4','5','6','7','14','30']
-        self.choice_show_max_events = ['1','2','3','4','5']
+        self.choice_show_max_events = ['1','2','3','4','5','7','10']
 
-        # Config stuff
+	# Config stuff
         self.config = ConfigParser.ConfigParser()
         if os.path.exists(os.path.expanduser('~/.config/dateevent.cfg')):
             self.readconf()
@@ -82,48 +83,15 @@ class CalEventDaemon(QtCore.QObject):
             self.config.write(configfile)      
 #----------------------------------------------------------------------------
 
-    def delete_feed(self):
-        service = EventFeedService('dateevent', 'DateEvent')
-        service.remove_items()
-
     def calendar_db_changed(self, arg1, arg2, arg3):
         if arg1 =='http://www.semanticdesktop.org/ontologies/2007/04/02/ncal#Event':
             print "kalender-db verändert, update event-screen"
             self.update_feed(self.selected_dayamount)
 
-    #Speichert geänderte Werte bei der Anzahl der Tage
-    def new_dayamount(self, new_dayamount):
-        self.selected_dayamount = int(new_dayamount) 
-        self.config.set('General', 'selected_dayamount', new_dayamount)
-        self.save_config()
-
-    def new_cal_selection(self, indexes_selected_calendars):
-        if indexes_selected_calendars:
-            if len(indexes_selected_calendars) == 1:
-                self.selected_calendars = [int(indexes_selected_calendars)]
-            else:
-                self.selected_calendars = eval(indexes_selected_calendars)
-        else:
-            self.selected_calendars = []
-        self.config.set('General', 'selected_calendars', self.selected_calendars)
-        self.save_config()
-
-    def update_show_events_max(self, index):
-        self.show_events_max = int(self.choice_show_max_events[int(index)])
-        self.config.set('General', 'show_events_max', self.choice_show_max_events[int(index)])
-        self.save_config()
-
-    def update_next_event_on_top(self,value):
-        self.next_event_on_top = value
-        self.config.set('General', 'next_event_on_top', value)
-        self.save_config()
-
-    #Vielleicht unnötig! :)
     def start(self, new_dayamount):
-        self.get_events(new_dayamount, self.selected_calendars, self.show_events_max)
+	self.get_events(new_dayamount, self.selected_calendars, self.show_events_max)
 
     def update_neu(self):
-        print "jetzt wird ein update durchgeführt"
         self.update_feed(self.selected_dayamount)
 
     def get_calendars(self):
@@ -131,7 +99,7 @@ class CalEventDaemon(QtCore.QObject):
         conn = connect("/home/user/.calendar/db")
         curs = conn.cursor()
         # SQL-Abfrage für alle Kalender 
-        query_calendars = "SELECT CalendarId,Name,Color\
+	query_calendars = "SELECT CalendarId,Name,Color\
                            FROM Calendars\
                            WHERE modifiedDate > 1306879230"
         # SQL-Abfrage durchführen und Ergebnisse ausgeben
@@ -153,44 +121,44 @@ class CalEventDaemon(QtCore.QObject):
         return calendar_ids
 
     def get_events(self, dayamount, calendar_ids, show_events_max):
-        # verbindung zur sqlite-db
-        conn = connect("/home/user/.calendar/db")
-        curs = conn.cursor()
-        # nächsten tage, die abgefragt werden sollen
-        days_ahead = int(self.choice_days_ahead[int(dayamount)])
+	# verbindung zur sqlite-db
+	conn = connect("/home/user/.calendar/db")
+	curs = conn.cursor()
+	# nächsten tage, die abgefragt werden sollen
+	days_ahead = int(self.choice_days_ahead[int(dayamount)])
         #print show_events_max
         # calendars
         selected_calender = [self.all_calendars[i][0] for i in calendar_ids]
         selected_calender = unicode("','".join(selected_calender))
-        # unix zeit von heute + 5 Sekunden wg Timer beim Daemon
-        unixtime_now = int(time()) + 5
+	# unix zeit von heute + 5 Sekunden wg Timer beim Daemon
+	unixtime_now = int(time()) + 5
         print "in get_events:", unixtime_now
-        unixtime_in_days_ahead = unixtime_now + days_ahead*86400
+	unixtime_in_days_ahead = unixtime_now + days_ahead*86400
 
-        # SQL-Abfrage der Events nur für die ausgewählten Kalender
+	# SQL-Abfrage der Events nur für die ausgewählten Kalender
         # zweite Datestartabfrage für die faketime
-        query_events = "SELECT Summary, Location, DateStart, Notebook, DateStart FROM Components \
-                        WHERE DateStart BETWEEN {0} AND {1}\
-                        AND Notebook in ('{2}')\
-                        AND DateDeleted = '0'".format(unixtime_now,
+	query_events = "SELECT Summary, Location, DateStart, Notebook, DateStart FROM Components \
+               		WHERE DateStart BETWEEN {0} AND {1}\
+               		AND Notebook in ('{2}')\
+               		AND DateDeleted = '0'".format(unixtime_now,
                                                       unixtime_in_days_ahead,
                                                       selected_calender)
-        curs.execute(query_events)
-        self.all_events = curs.fetchall()
+	curs.execute(query_events)
+	self.all_events = curs.fetchall()
         self.all_events = sorted(self.all_events, key = lambda event: event[2])
         print self.all_events
 
         if self.next_event_on_top:
             self.all_events = self.change_events_timeline(self.all_events)
 
-        for summary, location, datestart, cal, faketime in self.all_events[:self.show_events_max]:
+	for summary, location, datestart, cal, faketime in self.all_events[:self.show_events_max]:
             calId = self.calendar_ids.index(cal)
             faketime = datetime.fromtimestamp(faketime)
             datestart = datetime.fromtimestamp(datestart)
             day = int(str(datestart)[8:10])	
             self.feeder(summary, location, faketime, day, calId)
         # Verbindung zur DB beenden
-        conn.close()
+	conn.close()
 
     def change_events_timeline(self, events):
         time_last_event = events[-1][2]
@@ -214,20 +182,21 @@ class CalEventDaemon(QtCore.QObject):
              icon = '/usr/share/dateevent/img/icon-l-calendar-{0}.png'.format(day)
         else:
              icon = '/home/user/MyDocs/dateevent/img/icon-l-calendar-{0}.png'.format(day)
-
+	
         item = EventFeedItem(icon,
                u'Termin aus Kalender: <font color="{0}">{1}</font>'.format(calendarcolor,calendarname),
-               datestart) #gültiger Timestamp: datetime.datetime(2011, 11, 02, 8, 30, 0, 0)
+               datestart) 
+        #gültiger Timestamp: datetime.datetime(2011, 11, 02, 8, 30, 0, 0)		
         item.set_body(summary)
-        item.set_footer(location)
-
-        item.set_custom_action(self.on_item_clicked)
-        service.add_item(item)
+	item.set_footer(location)
+		
+	item.set_custom_action(self.on_item_clicked)
+	service.add_item(item)
 
 #--------------------------------------------------------------------------------------------------
 
     def update_feed(self, dayamount):
-        print "machen wir mal ein Update!"
+        print "machen wir mal ein Update!"		
         service = EventFeedService('dateevent', 'DateEvent')
         service.remove_items()
         self.readconf()
@@ -243,16 +212,33 @@ class CalEventDaemon(QtCore.QObject):
 
 #--------------------------------------------------------------------------------------------------
 
-    # Muss ausgelagert werden in den zukünftigen "Deamon",
-    # sonst wird es logischer Weise mit beendet - dann gibt es keine Reaktion mehr!
     def on_item_clicked(self):
         print 'the user clicked the item'
         subprocess.Popen(['/usr/bin/organiser'])
 
 #--------------------------------------------------------------------------------------------------
 
-#Starten der App
-if __name__ == '__main__':
-    app = QtGui.QApplication(sys.argv)
-    start = CalEventDaemon()
-    sys.exit(app.exec_())
+
+class MyDaemon(Daemon):
+    def run(self):
+        app = QtCore.QCoreApplication(sys.argv)
+        start = CalEventDaemon()
+        sys.exit(app.exec_())
+
+if __name__ == "__main__":
+    daemon = MyDaemon('/tmp/daemon-dateevent.pid')
+    if len(sys.argv) == 2:
+        if 'start' == sys.argv[1]:
+            daemon.start()
+        elif 'stop' == sys.argv[1]:
+            daemon.stop()
+        elif 'restart' == sys.argv[1]:
+            daemon.restart()
+        else:
+            print "Unknown command"
+            sys.exit(2)
+        sys.exit(0)
+    else:
+        print "usage: %s start|stop|restart" % sys.argv[0]
+        sys.exit(2)
+

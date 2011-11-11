@@ -6,8 +6,6 @@ import sys
 if os.path.exists('/usr/share/dateevent'):
     sys.path.append("/usr/share/dateevent")
 import ConfigParser
-# kann raus, wenn config läuft
-import pickle
 import subprocess
 import dbus
 import dbus.mainloop.glib
@@ -41,6 +39,7 @@ class CalEvent(QtCore.QObject):
         self.root = self.view.rootObject()
 
         # set data
+        self.daemon_pid = '/tmp/daemon-dateevent.pid'
         self.all_calendars = self.get_calendars()
         self.calendar_names = self.get_calendar_names(self.all_calendars)
         self.calendar_ids = self.get_calendar_ids(self.all_calendars)
@@ -59,9 +58,6 @@ class CalEvent(QtCore.QObject):
         # reagiert auf drücken des "Start"/"Update" Buttons und bindet an
         self.pyfunc.start.connect(self.start)
 
-        # Startbutton soll daemon starten, der im hintergund weiterläuft
-        #self.pyfunc.start.connect(self.start_daemon)
-
         # reagiert (nur) auf Update-Button - aktualisiert den Feed!
         self.pyfunc.update_feed.connect(self.update_feed) 
 
@@ -71,6 +67,7 @@ class CalEvent(QtCore.QObject):
         #löscht den Termine-Feed
         self.pyfunc.update_show_events_max.connect(self.update_show_events_max)
 
+        
         self.pyfunc.update_next_event_on_top.connect(self.update_next_event_on_top)
 
         # Config stuff
@@ -84,9 +81,6 @@ class CalEvent(QtCore.QObject):
             self.readconf()
             # startbutton "Start" in QML
             self.root.set_startupdate("True")
-
-        self.timer = QtCore.QTimer()
-        self.timer.setSingleShot(True)
         
         #expose the object to QML
         self.context = self.view.rootContext()
@@ -101,6 +95,9 @@ class CalEvent(QtCore.QObject):
         self.root.set_maxevents(self.show_events_max)
         self.root.set_nextontop_slider(self.next_event_on_top)
 
+        self.button_daemon = self.root.findChild(QtCore.QObject,"daemonbutton")
+        self.button_daemon.clicked.connect(self.stop_start_daemon)
+
         #dbus
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
         self.bus = dbus.SessionBus()
@@ -113,11 +110,6 @@ class CalEvent(QtCore.QObject):
         except dbus.DBusException:
             print_exc()
             sys.exit(1)
-
-        self.iface.connect_to_signal("GraphUpdated", self.calendar_db_changed)
-        self.timer.timeout.connect(self.update_neu)
-
-        #self.update_feed(self.selected_dayamount)
 
 
 #-------------------------------------------------------------------------
@@ -152,13 +144,6 @@ class CalEvent(QtCore.QObject):
         service = EventFeedService('dateevent', 'DateEvent')
         service.remove_items()
 
-    def calendar_db_changed(self, arg1, arg2, arg3):
-        if arg1 =='http://www.semanticdesktop.org/ontologies/2007/04/02/ncal#Event':
-            print "kalender-db verändert, update event-screen"
-            self.update_feed(self.selected_dayamount)
-
-           
-    #Speichert geänderte Werte bei der Anzahl der Tage
     def new_dayamount(self, new_dayamount):
         self.selected_dayamount = int(new_dayamount) 
         self.config.set('General', 'selected_dayamount', new_dayamount)
@@ -193,17 +178,16 @@ class CalEvent(QtCore.QObject):
         self.config.set('General', 'next_event_on_top', value)
         self.save_config()
 
-        #Vielleicht unnötig! :)
     def start(self, new_dayamount):
         self.get_events(new_dayamount, self.selected_calendars, self.show_events_max)
 
-    def update_neu(self):
-        print "jetzt wird ein update durchgeführt"
-        self.update_feed(self.selected_dayamount)
-
-    def start_daemon(self):
-        daemon = QtCore.QProcess(parent)
-        # TODO
+    def stop_start_daemon(self):
+        if os.path.exists(self.daemon_pid):
+            print os.path.exists(self.daemon_pid), "daemon wird gestoppt"
+            subprocess.Popen(['python','dateevent_daemon.py','stop'])
+        else:
+            print os.path.exists(self.daemon_pid), "daemon wird gestartet"
+            subprocess.Popen(['python','dateevent_daemon.py','start'])
 
     def get_calendars(self):
         # verbindung zur sqlite-db
@@ -305,24 +289,13 @@ class CalEvent(QtCore.QObject):
         item.set_custom_action(self.on_item_clicked)
         service.add_item(item)
 
-#--------------------------------------------------------------------------------------------------
-
-    def update_feed_alt(self, dayamount):
-        print "machen wir mal nur ein Update!"		
-        service = EventFeedService('dateevent', 'DateEvent')
-        service.remove_items()
-        self.get_events(dayamount,self.selected_calendars, self.show_events_max)
-
+#-------------------------------------------------------------------------------------------------
 
     def update_feed(self, dayamount):	
         service = EventFeedService('dateevent', 'DateEvent')
         service.remove_items()
         self.readconf()
         self.get_events(dayamount,self.selected_calendars, self.show_events_max)
-        if self.timer.isActive():
-            self.timer.stop()
-        self.timer.setInterval((self.all_events[0][2]-time())*1000)
-        self.timer.start()
 
 #--------------------------------------------------------------------------------------------------
 
@@ -353,4 +326,3 @@ if __name__ == '__main__':
     start = CalEvent()
     start.view.showFullScreen()
     sys.exit(app.exec_())
-
