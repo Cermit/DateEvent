@@ -184,10 +184,10 @@ class CalEvent(QtCore.QObject):
     def stop_start_daemon(self):
         if os.path.exists(self.daemon_pid):
             print os.path.exists(self.daemon_pid), "daemon wird gestoppt"
-            subprocess.Popen(['python','dateevent_daemon.py','stop'])
+            subprocess.Popen(['python','dateevent_daemon','stop'])
         else:
             print os.path.exists(self.daemon_pid), "daemon wird gestartet"
-            subprocess.Popen(['python','dateevent_daemon.py','start'])
+            subprocess.Popen(['python','dateevent_daemon','start'])
 
     def get_calendars(self):
         # verbindung zur sqlite-db
