@@ -6,7 +6,7 @@ def read(fname):
 
 setup(name="dateevent",
       scripts=['dateevent'],
-      version='0.2.0',
+      version='0.2.1',
       maintainer="Gabriel Boehme and Boris Pohler",
       maintainer_email="m.gabrielboehme@googlemail.com",
       description="DateEvent",
@@ -14,6 +14,8 @@ setup(name="dateevent",
       data_files=[('share/applications',['dateevent.desktop']),
                   ('bin/',['dateevent_daemon']),
                   ('share/icons/hicolor/64x64/apps', ['dateevent.png']),
+                  ('share/dateevent/img', ['dateeventsplash.jpg']),
                   ('share/dateevent/qml', glob.glob('qml/*.*')),
                   ('share/dateevent/img', glob.glob('img/*.png')),
+                  ('share/dateevent',['daemon.py']),
                   ('share/dateevent',['eventfeed.py']),],)

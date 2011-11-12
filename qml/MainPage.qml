@@ -11,6 +11,7 @@ Page {
     property alias setnextontopslider: chronik_slider.checked 
     property alias setdayamountindex: dialog_days.selectedIndex
     property alias setmaxevents: dialog_items.selectedIndex
+    property alias daemon_status: daemonbutton.text
     property alias infoDialog: infoDialog
     property alias resetDialog: resetDialog
 

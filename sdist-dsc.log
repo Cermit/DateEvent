@@ -1,10 +1,10 @@
 running sdist_dsc
-CALLING dpkg-source -b dateevent-0.2.0 (in dir deb_dist)
+CALLING dpkg-source -b dateevent-0.2.1 (in dir deb_dist)
 dpkg-source: Information: Quellformat »3.0 (quilt)« wird verwendet
-dpkg-source: Information: dateevent wird unter Benutzung des existierenden ./dateevent_0.2.0.orig.tar.gz gebaut
-dpkg-source: Information: dateevent wird in dateevent_0.2.0-1.debian.tar.gz gebaut
-dpkg-source: Information: dateevent wird in dateevent_0.2.0-1.dsc gebaut
-dpkg-source: Warnung: unsigniertes Quellpaket wird extrahiert (dateevent_0.2.0-1.dsc)
-dpkg-source: Information: dateevent wird nach dateevent-0.2.0 extrahiert
-dpkg-source: Information: dateevent_0.2.0.orig.tar.gz wird entpackt
-dpkg-source: Information: dateevent_0.2.0-1.debian.tar.gz wird entpackt
+dpkg-source: Information: dateevent wird unter Benutzung des existierenden ./dateevent_0.2.1.orig.tar.gz gebaut
+dpkg-source: Information: dateevent wird in dateevent_0.2.1-1.debian.tar.gz gebaut
+dpkg-source: Information: dateevent wird in dateevent_0.2.1-1.dsc gebaut
+dpkg-source: Warnung: unsigniertes Quellpaket wird extrahiert (dateevent_0.2.1-1.dsc)
+dpkg-source: Information: dateevent wird nach dateevent-0.2.1 extrahiert
+dpkg-source: Information: dateevent_0.2.1.orig.tar.gz wird entpackt
+dpkg-source: Information: dateevent_0.2.1-1.debian.tar.gz wird entpackt

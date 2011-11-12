@@ -10,6 +10,11 @@ PageStackWindow {
         else {mainPage.setstartupdatetext = qsTr("manuelles Update")}
         }
 
+    function show_daemon_status(str) {
+        if (str === "True"){mainPage.daemon_status = qsTr("Daemon stoppen")}
+        else {mainPage.daemon_status = qsTr("Daemon starten")}
+        }
+
     function set_dayamount(num) {
         mainPage.setdayamountindex = num
         }
