@@ -263,7 +263,7 @@ class CalEvent(QtCore.QObject):
 
 #--------------------------------------------------------------------------------------------------
 
-   def feeder(self, summary, location, datestart, day, calId):
+    def feeder(self, summary, location, datestart, day, calId):
         calendarname = self.all_calendars[calId][1]
         calendarcolor = self.all_calendars[calId][2]
 
