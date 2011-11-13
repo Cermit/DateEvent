@@ -144,6 +144,7 @@ class CalEventDaemon(QtCore.QObject):
                                                       unixtime_in_days_ahead,
                                                       selected_calender)
 	curs.execute(query_events)
+        self.all_events = []
 	self.all_events = curs.fetchall()
         self.all_events = sorted(self.all_events, key = lambda event: event[2])
         print self.all_events
@@ -161,13 +162,14 @@ class CalEventDaemon(QtCore.QObject):
 	conn.close()
 
     def change_events_timeline(self, events):
-        time_last_event = events[-1][2]
-        for i, event in enumerate(events):
-            events[i] = list(event)
-            time_event = event[2]
-            days_delta = (time_last_event - time_event)/86400
-            faketime = time_event + days_delta * 86400 + (len(events)-i)*86400
-            events[i][4] = faketime
+        if events:
+            time_last_event = events[-1][2]
+            for i, event in enumerate(events):
+                events[i] = list(event)
+                time_event = event[2]
+                days_delta = (time_last_event - time_event)/86400
+                faketime = time_event + days_delta * 86400 + (len(events)-i)*86400
+                events[i][4] = faketime
         return events
 
 #--------------------------------------------------------------------------------------------------
@@ -184,10 +186,10 @@ class CalEventDaemon(QtCore.QObject):
              icon = '/home/user/MyDocs/dateevent/img/icon-l-calendar-{0}.png'.format(day)
 	
         item = EventFeedItem(icon,
-               u'Termin aus Kalender: <font color="{0}">{1}</font>'.format(calendarcolor,calendarname),
+               u'<font color="{0}" size="-3">{1}</font>'.format(calendarcolor,calendarname),
                datestart) 
         #gültiger Timestamp: datetime.datetime(2011, 11, 02, 8, 30, 0, 0)		
-        item.set_body(summary)
+        item.set_body(u'<font size="+1">{0}</font>'.format(summary))
 	item.set_footer(location)
 		
 	item.set_custom_action(self.on_item_clicked)

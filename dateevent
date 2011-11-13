@@ -263,7 +263,7 @@ class CalEvent(QtCore.QObject):
 
 #--------------------------------------------------------------------------------------------------
 
-    def feeder(self, summary, location, datestart, day, calId):
+   def feeder(self, summary, location, datestart, day, calId):
         calendarname = self.all_calendars[calId][1]
         calendarcolor = self.all_calendars[calId][2]
 
@@ -273,16 +273,16 @@ class CalEvent(QtCore.QObject):
              icon = '/usr/share/dateevent/img/icon-l-calendar-{0}.png'.format(day)
         else:
              icon = '/home/user/MyDocs/dateevent/img/icon-l-calendar-{0}.png'.format(day)
-
+	
         item = EventFeedItem(icon,
-               u'Termin aus Kalender: <font color="{0}">{1}</font>'.format(calendarcolor,calendarname),
+               u'<font color="{0}" size="-3">{1}</font>'.format(calendarcolor,calendarname),
                datestart) 
         #gültiger Timestamp: datetime.datetime(2011, 11, 02, 8, 30, 0, 0)		
-        item.set_body(summary)
-        item.set_footer(location)
-
-        item.set_custom_action(self.on_item_clicked)
-        service.add_item(item)
+        item.set_body(u'<font size="+1">{0}</font>'.format(summary))
+	item.set_footer(location)
+		
+	item.set_custom_action(self.on_item_clicked)
+	service.add_item(item)
 
 #-------------------------------------------------------------------------------------------------
 
