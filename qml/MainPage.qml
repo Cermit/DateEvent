@@ -129,7 +129,9 @@ Page {
         anchors {top: parent.top; topMargin: 575; horizontalCenter: parent.horizontalCenter}
         text: qsTr("Daemon starten")
 
-        onClicked: {}
+        onClicked: {
+            if(dialog_calendar.selectedIndexes.length === 0 ){noCalDialog.open()}
+        }
     }
 
     Button {
@@ -139,6 +141,7 @@ Page {
         text: qsTr("Start")
 
         onClicked: {
+            if(dialog_calendar.selectedIndexes.length === 0 ){noCalDialog.open()}
             if(startupdate.text == qsTr("Start")){pyfunc.start(dialog_days.selectedIndex); startupdate.text = qsTr("manuelles Update")}
             else{pyfunc.update_feed(dialog_days.selectedIndex)}
             }
@@ -228,6 +231,19 @@ Page {
 
         onRejected: {
             infoDialog.close()
+        }
+    }
+
+    QueryDialog {
+        id: noCalDialog
+        titleText: qsTr("Warnung!")
+        message: qsTr("Im Moment ist kein Kalender ausgewählt, der angezeigt werden kann.")
+        acceptButtonText: qsTr("Jetzt wählen")
+        rejectButtonText: qsTr("Abbrechen")
+
+        onAccepted: {
+            noCalDialog.close()
+            dialog_calendar.open()
         }
     }
     }
