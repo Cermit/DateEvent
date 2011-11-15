@@ -21,6 +21,8 @@ from PySide import QtDeclarative
 #OpenGL Rendering
 from PySide import QtOpenGL
 
+SUPPORTED_LANGUAGES={'de_DE':'dateevent_de', 'de':'dateevent_de', 'en_GB':'dateevent_en', 'en':'dateevent_en'}
+
 class CalEvent(QtCore.QObject):
     def __init__(self):
         QtCore.QObject.__init__(self)
@@ -318,6 +320,19 @@ class pyfunc(QtCore.QObject):
 #Starten der App
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
+
+    language = os.environ.get('LANG','')
+    print language
+    if language in SUPPORTED_LANGUAGES:
+        translator = QtCore.QTranslator()
+        translator.load('/usr/share/dateevent/qml/i18n' + SUPPORTED_LANGUAGES[language])
+        app.installTranslator(translator)
+
     start = CalEvent()
     start.view.showFullScreen()
     sys.exit(app.exec_())
+
+
+
+
+
