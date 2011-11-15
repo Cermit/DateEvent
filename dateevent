@@ -325,7 +325,7 @@ if __name__ == '__main__':
     print language
     if language in SUPPORTED_LANGUAGES:
         translator = QtCore.QTranslator()
-        translator.load('/usr/share/dateevent/qml/i18n' + SUPPORTED_LANGUAGES[language])
+        translator.load('/usr/share/dateevent/qml/i18n/' + SUPPORTED_LANGUAGES[language])
         app.installTranslator(translator)
 
     start = CalEvent()
