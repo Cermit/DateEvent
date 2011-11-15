@@ -327,6 +327,10 @@ if __name__ == '__main__':
         translator = QtCore.QTranslator()
         translator.load('/usr/share/dateevent/qml/i18n/' + SUPPORTED_LANGUAGES[language])
         app.installTranslator(translator)
+    else:
+        translator = QtCore.QTranslator()
+        translator.load('usr/share/dateevent/qml/i18n/dateevent_en')
+        app.installTranslator(translator)
 
     start = CalEvent()
     start.view.showFullScreen()
