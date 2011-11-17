@@ -320,7 +320,7 @@ if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
 
     language = os.environ.get('LANG','')
-    #print language
+    print "Your system language is:", language
     path = '/usr/share/dateevent/qml/i18n/'
     #for local testing
     #path = '/home/user/MyDocs/dateevent/qml/i18n/'
@@ -333,7 +333,7 @@ if __name__ == '__main__':
 
     if language in supported_languages:
         translator = QtCore.QTranslator()
-        translator.load(path + SUPPORTED_LANGUAGES[language])
+        translator.load(path + 'dateevent_' + language)
         app.installTranslator(translator)
     else:
         translator = QtCore.QTranslator()
@@ -343,7 +343,6 @@ if __name__ == '__main__':
     start = CalEvent()
     start.view.showFullScreen()
     sys.exit(app.exec_())
-
 
 
 
