@@ -21,8 +21,6 @@ from PySide import QtDeclarative
 #OpenGL Rendering
 from PySide import QtOpenGL
 
-SUPPORTED_LANGUAGES={'de_DE':'dateevent_de', 'de':'dateevent_de', 'en_GB':'dateevent_en', 'en':'dateevent_en'}
-
 class CalEvent(QtCore.QObject):
     def __init__(self):
         QtCore.QObject.__init__(self)
@@ -178,11 +176,11 @@ class CalEvent(QtCore.QObject):
 
     def stop_start_daemon(self):
         if os.path.exists(self.daemon_pid):
-            print os.path.exists(self.daemon_pid), "daemon wird gestoppt"
+            #print os.path.exists(self.daemon_pid), "daemon wird gestoppt"
             subprocess.Popen(['dateevent_daemon','stop'])
             self.root.show_daemon_status("False")
         else:
-            print os.path.exists(self.daemon_pid), "daemon wird gestartet"
+            #print os.path.exists(self.daemon_pid), "daemon wird gestartet"
             subprocess.Popen(['dateevent_daemon','start'])
             self.root.show_daemon_status("True")
 
@@ -210,8 +208,8 @@ class CalEvent(QtCore.QObject):
         calendar_ids = []
         for calId, name, color in calendarlist:
             calendar_ids.append(calId)
-        print "cal-ids:"
-        print calendar_ids
+        #print "cal-ids:"
+        #print calendar_ids
         return calendar_ids
 
     def get_events(self, dayamount, calendar_ids, show_events_max):
@@ -220,7 +218,7 @@ class CalEvent(QtCore.QObject):
         curs = conn.cursor()
         # nächsten tage, die abgefragt werden sollen
         days_ahead = int(self.choice_days_ahead[int(dayamount)])
-        print show_events_max
+        #print show_events_max
         # calendars
         selected_calender = [self.all_calendars[i][0] for i in calendar_ids]
         selected_calender = unicode("','".join(selected_calender))
@@ -238,7 +236,7 @@ class CalEvent(QtCore.QObject):
                                                       selected_calender)
         curs.execute(query_events)
         self.all_events = curs.fetchall()
-        print self.all_events
+        #print self.all_events
 
         if self.next_event_on_top:
             self.all_events = self.change_events_timeline(self.all_events)
@@ -322,14 +320,24 @@ if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
 
     language = os.environ.get('LANG','')
-    print language
-    if language in SUPPORTED_LANGUAGES:
+    #print language
+    path = '/usr/share/dateevent/qml/i18n/'
+    #for local testing
+    #path = '/home/user/MyDocs/dateevent/qml/i18n/'
+    ts_files = os.listdir(path)
+    supported_languages = []
+    for file in ts_files:
+        filename, suffix = os.path.splitext(file)
+        if suffix == '.qm':
+            supported_languages.append('_'.join(filename.split('_')[1:]))
+
+    if language in supported_languages:
         translator = QtCore.QTranslator()
-        translator.load('/usr/share/dateevent/qml/i18n/' + SUPPORTED_LANGUAGES[language])
+        translator.load(path + SUPPORTED_LANGUAGES[language])
         app.installTranslator(translator)
     else:
         translator = QtCore.QTranslator()
-        translator.load('usr/share/dateevent/qml/i18n/dateevent_en')
+        translator.load(path + 'dateevent_en')
         app.installTranslator(translator)
 
     start = CalEvent()

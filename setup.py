@@ -17,6 +17,7 @@ setup(name="dateevent",
                   ('share/icons/hicolor/64x64/apps', ['dateevent.png']),
                   ('share/dateevent/img', ['dateeventsplash.jpg']),
                   ('share/dateevent/qml', glob.glob('qml/*.*')),
+                  ('share/dateevent/qml/i18n', glob.glob('qml/i18n/*.*')),
                   ('share/dateevent/img', glob.glob('img/*.png')),
                   ('share/dateevent',['daemon.py']),
                   ('share/dateevent',['eventfeed.py']),],)
