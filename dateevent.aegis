@@ -1,0 +1,7 @@
+<aegis>
+   <request>
+      <credential name="GRP::calendar" />
+      <for path="/usr/bin/dateevent" />
+      <for path="/usr/bin/dateevent_daemon" />
+   </request>
+</aegis>

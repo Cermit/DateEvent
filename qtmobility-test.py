@@ -20,6 +20,7 @@ class QtMobilityTest(QtCore.QObject):
 
         # Infos über collections mit metaData(), für alle Meta-Daten einfach nur metaData() aufrufen
         for collection in self.collections:
+            print collection.metaData()
             print collection.metaData('Color'), collection.metaData('Name')
 
         # Filter erzeugen und mit ausgewählten Collections bestücken, hier über Namen
